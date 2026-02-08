@@ -21,4 +21,13 @@ public class Client {
 
     @Column(name="password",nullable=false,length=16)
     private String password;
+
+    @ManyToMany
+    @JsonBackReference
+    @JoinTable(
+            name="ClientRole",
+            joinColumns=@JoinColumn(name="clientId"),
+            inverseJoinColumns=@JoinColumn(name="roleId")
+    )
+    private Set<role> roleSet;
 }
