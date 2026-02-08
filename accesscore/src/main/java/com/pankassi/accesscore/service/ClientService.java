@@ -5,9 +5,7 @@ import com.pankassi.accesscore.domain.model.Role;
 import com.pankassi.accesscore.domain.repository.ClientRepository;
 import com.pankassi.accesscore.domain.repository.RoleRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.HashSet;
 import java.util.Set;
