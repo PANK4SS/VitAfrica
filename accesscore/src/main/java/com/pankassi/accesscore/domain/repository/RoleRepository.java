@@ -1,4 +1,4 @@
 package com.pankassi.accesscore.domain.repository;
 
-public interface RoleRepository {
+public interface RoleRepository extends JpaRepository<Role,Long>{
 }
