@@ -18,7 +18,7 @@ public class RoleService {
         if(roleRepository.existsByRoleName(roleRequest.name())){
             throw new IllegalStateException("The provided Role Already exists");
         }
-        
+
         String roleName = roleRequest.name().trim().toUpperCase();
 
         Role role = new Role();
