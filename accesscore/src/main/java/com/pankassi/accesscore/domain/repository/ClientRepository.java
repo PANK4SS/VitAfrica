@@ -1,4 +1,4 @@
 package com.pankassi.accesscore.domain.repository;
 
-public interface ClientRepository {
+public interface ClientRepository extends JpaRepository<Client,Long> {
 }
