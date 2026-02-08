@@ -15,7 +15,6 @@ import java.util.Set;
 @Service
 @RequiredArgsConstructor
 public class ClientService {
-
     private final ClientRepository clientRepository;
     private final RoleRepository roleRepository;
 
