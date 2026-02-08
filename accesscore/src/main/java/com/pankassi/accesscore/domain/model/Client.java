@@ -1,5 +1,15 @@
 package com.pankassi.accesscore.domain.model;
 
+import jakarta.persistence.*;
+import lombok.*;
+// Imports Jackson (JSON)
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
+// Import Java Util
+import java.util.Set;
+
+
+
 @Entity
 @Getter
 @Setter
@@ -10,16 +20,16 @@ package com.pankassi.accesscore.domain.model;
 public class Client {
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
-    @Column(name = "client")
+    @Column(name = "clientId")
     private Long clientId;
 
     @Column(name="clientName",nullable=false,length=100)
     private String clientName;
 
     @Column(name="email",nullable=false)
-    private String emai;
+    private String email;
 
-    @Column(name="password",nullable=false,length=16)
+    @Column(name="password",nullable=false,length=255)
     private String password;
 
     @ManyToMany
@@ -29,5 +39,5 @@ public class Client {
             joinColumns=@JoinColumn(name="clientId"),
             inverseJoinColumns=@JoinColumn(name="roleId")
     )
-    private Set<role> roleSet;
+    private Set<Role> roleSet;
 }
