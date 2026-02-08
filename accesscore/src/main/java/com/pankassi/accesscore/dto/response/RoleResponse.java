@@ -1,4 +1,8 @@
 package com.pankassi.accesscore.dto.response;
 
-public record RoleResponse() {
+public record RoleResponse(
+        Long roleId,
+        String roleName,
+        String roleDescription
+) {
 }
