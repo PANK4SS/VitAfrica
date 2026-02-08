@@ -20,6 +20,8 @@ public class Role {
     @Column(name="description", nullable=false)
     private String description;
 
-    @ManyToMany
+    @ManyToMany(mappedBy="role")
+    @JsonBackReference
+    private Set<Client> clientSet;
 
 }
