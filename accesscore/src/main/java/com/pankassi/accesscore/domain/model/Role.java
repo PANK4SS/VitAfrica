@@ -1,13 +1,20 @@
 package com.pankassi.accesscore.domain.model;
 
+import jakarta.persistence.*;
+import lombok.*;
+// Imports Jackson (JSON)
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
+// Import Java Util
+import java.util.Set;
+
 @Entity
 @Getter
 @Setter
 @Builder
-@AllArgsRequired
-@NoArgsRequired
+@AllArgsConstructor
+@NoArgsConstructor
 @Table(name="Role")
-@Builder
 public class Role {
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
@@ -20,7 +27,7 @@ public class Role {
     @Column(name="description", nullable=false)
     private String description;
 
-    @ManyToMany(mappedBy="role")
+    @ManyToMany(mappedBy="roleSet")
     @JsonBackReference
     private Set<Client> clientSet;
 
