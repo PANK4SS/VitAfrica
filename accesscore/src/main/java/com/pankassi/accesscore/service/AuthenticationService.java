@@ -30,7 +30,7 @@ public class AuthenticationService {
 
     public Client registerClient(ClientRequest clientRequest){
         // Check if the user provide email already exist in DB
-        if(clientRepository.existByEmail(clientRequest.email())){
+        if(clientRepository.existsByEmail(clientRequest.email())){
             throw new IllegalStateException("The provided email is already used");
         }
         //Collect default role by usign default role name
