@@ -1,5 +1,6 @@
 package com.pankassi.accesscore.domain.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 // Imports Jackson (JSON)
@@ -14,6 +15,7 @@ import java.util.Set;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Table(name="Role")
 public class Role {
     @Id
@@ -28,7 +30,7 @@ public class Role {
     private String description;
 
     @ManyToMany(mappedBy="roleSet")
-    @JsonBackReference
+    @JsonManagedReference
     private Set<Client> clientSet;
 
 }
