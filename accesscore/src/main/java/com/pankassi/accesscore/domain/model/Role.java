@@ -6,7 +6,7 @@ package com.pankassi.accesscore.domain.model;
 @Builder
 @AllArgsRequired
 @NoArgsRequired
-@Table(namme="Role")
+@Table(name="Role")
 @Builder
 public class Role {
     @Id
