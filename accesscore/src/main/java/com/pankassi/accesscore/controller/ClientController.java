@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 public class ClientController {
     private final ClientService clientService;
 
+    //Assign existing role to an existing client endpoint
     @PostMapping("/{email}/roles")
     public ResponseEntity<Client> assignRoles(
             @PathVariable String email,
