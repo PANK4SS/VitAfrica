@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthenticationController {
     private final AuthenticationService authenticationService;
 
+    //Registration endpoint
     @PostMapping("/register")
     public ResponseEntity<ClientResponse> registerClient(@Valid @RequestBody ClientRequest clientRequest){
             Client client = authenticationService.registerClient(clientRequest);
