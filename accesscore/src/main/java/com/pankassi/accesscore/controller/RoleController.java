@@ -22,6 +22,7 @@ public class RoleController {
     @Autowired
     private final RoleService roleService;
 
+    // Endpoint to create a role
     @PostMapping
     public ResponseEntity<RoleResponse> createRole(@Valid @RequestBody RoleRequest roleRequest){
         Role role = roleService.createRole(roleRequest);
