@@ -1,10 +1,12 @@
 package com.pankassi.accesscore.domain.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
 // Import Java Util
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -32,4 +34,13 @@ public class Role {
     @JsonManagedReference
     private Set<Client> clientSet;
 
+    @ManyToMany
+    @JsonIgnore
+    @JoinTable(
+            name = "RoleResource",
+            joinColumns = @JoinColumn(name = "roleId"),
+            inverseJoinColumns = @JoinColumn(name = "resourceId")
+    )
+    @Builder.Default
+    private Set<Resource> resourceSet = new HashSet<>();
 }
