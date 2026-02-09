@@ -1,11 +1,13 @@
 package com.pankassi.accesscore.domain.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 // Imports Jackson (JSON)
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
 // Import Java Util
+import java.util.HashSet;
 import java.util.Set;
 
 
@@ -28,17 +30,19 @@ public class Client {
     private String clientName;
 
     @Column(name="email",nullable=false)
+    @EqualsAndHashCode.Include
     private String email;
 
     @Column(name="password",nullable=false,length=255)
     private String password;
 
-    @ManyToMany
-    @JsonBackReference
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JsonIgnore
     @JoinTable(
             name="ClientRole",
             joinColumns=@JoinColumn(name="clientId"),
             inverseJoinColumns=@JoinColumn(name="roleId")
     )
-    private Set<Role> roleSet;
+    @Builder.Default
+    private Set<Role> roleSet = new HashSet<>();
 }
