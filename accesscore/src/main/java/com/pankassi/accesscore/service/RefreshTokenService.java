@@ -22,7 +22,7 @@ public class RefreshTokenService {
 
     public RefreshToken createRefreshToken(Client client) {
         // Nettoyer les anciens tokens de cet utilisateur (optionnel, mais propre)
-        refreshTokenRepository.deleteByClientId(client.getClientId());
+        refreshTokenRepository.deleteByClientClientId(client.getClientId());
 
         RefreshToken refreshToken = RefreshToken.builder()
                 .client(client)
