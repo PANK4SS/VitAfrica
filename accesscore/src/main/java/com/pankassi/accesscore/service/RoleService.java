@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class RoleService {
-    @Autowired
     private final RoleRepository roleRepository;
 
     public Role createRole(RoleRequest roleRequest){
