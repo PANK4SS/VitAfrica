@@ -3,8 +3,6 @@ package com.pankassi.accesscore.domain.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
-// Imports Jackson (JSON)
-import com.fasterxml.jackson.annotation.JsonBackReference;
 
 // Import Java Util
 import java.util.HashSet;
