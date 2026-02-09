@@ -1,11 +1,13 @@
 package com.pankassi.accesscore.service;
 
 import com.pankassi.accesscore.domain.model.Client;
+import com.pankassi.accesscore.domain.model.RefreshToken;
 import com.pankassi.accesscore.domain.model.Role;
 import com.pankassi.accesscore.domain.repository.ClientRepository;
 import com.pankassi.accesscore.domain.repository.RoleRepository;
 import com.pankassi.accesscore.dto.request.ClientRequest;
 import com.pankassi.accesscore.dto.request.LoginRequest;
+import com.pankassi.accesscore.dto.response.AuthenticationResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,13 +20,11 @@ import java.util.Set;
 @Service
 @RequiredArgsConstructor
 public class AuthenticationService {
-    @Autowired
     private final ClientRepository clientRepository;
-
-    @Autowired
     private final RoleRepository roleRepository;
-
     private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
+    private final RefreshTokenService refreshTokenService;
 
     @Value("${app.default.role:USER}")
     private String defaultRoleName;
@@ -50,8 +50,30 @@ public class AuthenticationService {
         return clientRepository.save(client);
     }
 
-    public Client loginClient(LoginRequest loginRequest){
 
+    public AuthenticationResponse login(LoginRequest request) {
+        // 1. Trouver le client
+        Client client = clientRepository.findByEmail(request.email())
+                .orElseThrow(() -> new IllegalArgumentException("Invalid email or password"));
+
+        // 2. Vérifier le mot de passe
+        if (!passwordEncoder.matches(request.password(), client.getPassword())) {
+            throw new IllegalArgumentException("Invalid email or password");
+        }
+
+        // 3. Générer l'Access Token
+        String accessToken = jwtService.generateToken(client);
+
+        // 4. Générer le Refresh Token
+        RefreshToken refreshToken = refreshTokenService.createRefreshToken(client);
+
+        // 5. Construire la réponse (CORRECTION ICI : utiliser le constructeur standard)
+        return new AuthenticationResponse(
+                accessToken,
+                refreshToken.getToken(),
+                client.getEmail(),
+                client.getClientName()
+        );
     }
 
 
