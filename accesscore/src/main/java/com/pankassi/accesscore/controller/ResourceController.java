@@ -3,7 +3,6 @@ package com.pankassi.accesscore.controller;
 import com.pankassi.accesscore.domain.model.Resource;
 import com.pankassi.accesscore.dto.request.ResourceRequest;
 import com.pankassi.accesscore.dto.response.ResourceResponse;
-import com.pankassi.accesscore.dto.response.RoleResponse;
 import com.pankassi.accesscore.service.ResourceService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
