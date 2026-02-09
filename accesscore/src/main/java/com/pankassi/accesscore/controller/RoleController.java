@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/roles")
 @RequiredArgsConstructor
 public class RoleController {
-    @Autowired
     private final RoleService roleService;
 
     // Endpoint to create a role
