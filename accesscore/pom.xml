@@ -30,7 +30,7 @@
 		<java.version>17</java.version>
 	</properties>
 	<dependencies>
-		<!-- Spring Doc OpenAPI -->
+		<!-- Spring Doc OpenAPI  on http://localhost:serverport/swagger-ui/index.html -->
 		<dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
