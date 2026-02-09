@@ -23,6 +23,8 @@ public class ResourceService {
         Resource resource = new Resource();
         resource.setResourceName(resourceName);
         resource.setResourceDescription(resourceRequest.description());
+        resource.setHttpMethod(resourceRequest.httpMethod());
+        resource.setEndpoint(resourceRequest.endpoint());
 
         return resourceRepository.save(resource);
     }
