@@ -5,6 +5,7 @@ import com.pankassi.accesscore.domain.model.Role;
 import com.pankassi.accesscore.domain.repository.ClientRepository;
 import com.pankassi.accesscore.domain.repository.RoleRepository;
 import com.pankassi.accesscore.dto.request.ClientRequest;
+import com.pankassi.accesscore.dto.request.LoginRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -48,5 +49,10 @@ public class AuthenticationService {
 
         return clientRepository.save(client);
     }
+
+    public Client loginClient(LoginRequest loginRequest){
+
+    }
+
 
 }
