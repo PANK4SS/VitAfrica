@@ -1,4 +1,11 @@
 package com.pankassi.accesscore.dto.request;
 
-public record ResourceRequest() {
+import jakarta.validation.constraints.NotBlank;
+
+public record ResourceRequest(
+        @NotBlank(message = "The Resource Name is required")
+        String name,
+        @NotBlank(message = "The Resource description is required")
+        String description
+) {
 }
