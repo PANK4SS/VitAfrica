@@ -17,9 +17,7 @@ public class ClientController {
 
     //Assign existing role to an existing client endpoint
     @PostMapping("/{email}/roles")
-    public ResponseEntity<ClientResponse> assignRoles(  // ← Changé de Client à ClientResponse
-                                                        @PathVariable String email,
-                                                        @Valid @RequestBody AssignRolesRequest request
+    public ResponseEntity<ClientResponse> assignRoles(@PathVariable String email, @Valid @RequestBody AssignRolesRequest request
     ) {
         Client updatedClient = clientService.assignRoles(email, request.roles());
         ClientResponse response = ClientResponse.from(updatedClient);  // ← Conversion en DTO
