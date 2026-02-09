@@ -1,7 +1,10 @@
 package com.pankassi.accesscore.domain.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.Set;
 
 @Entity
 @Getter
@@ -24,5 +27,7 @@ public class Resource {
     @Column(name = "resourceDescription")
     private String resourceDescription;
 
-    
+    @ManyToMany(mappedBy="resourceSet")
+    @JsonManagedReference
+    private Set<Role> roleSet;
 }
