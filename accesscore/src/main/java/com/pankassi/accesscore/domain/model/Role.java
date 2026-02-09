@@ -24,6 +24,7 @@ public class Role {
     private Long roleId;
 
     @Column(name="roleName", nullable=false, unique = true)
+    @EqualsAndHashCode.Include
     private String roleName;
 
     @Column(name="description", nullable=false)
