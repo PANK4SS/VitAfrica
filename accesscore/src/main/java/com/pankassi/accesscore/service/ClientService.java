@@ -5,38 +5,52 @@ import com.pankassi.accesscore.domain.model.Role;
 import com.pankassi.accesscore.domain.repository.ClientRepository;
 import com.pankassi.accesscore.domain.repository.RoleRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
 import java.util.Set;
 
+@Slf4j  //  logger ADDED
 @Service
 @RequiredArgsConstructor
 public class ClientService {
     private final ClientRepository clientRepository;
     private final RoleRepository roleRepository;
 
+    @Transactional  // Persistence
     public Client assignRoles(String email, Set<String> roleNames) {
 
-        //Collect existing Clien using the provided mail
+        // Collect existing Client using the provided email
         Client client = clientRepository.findByEmail(email)
                 .orElseThrow(() ->
                         new IllegalArgumentException("Client not found: " + email)
                 );
 
-        // Check if all provided roles exists : if only one in the list don't exist, stop request
-        Set<Role> roles = new HashSet<>();
+        log.info("Client found: {} with existing roles: {}",
+                client.getEmail(),
+                client.getRoleSet().stream()
+                        .map(Role::getRoleName)
+                        .toList());
 
+        // Check if all provided roles exist
+        Set<Role> newRoles = new HashSet<>();
         for (String roleName : roleNames) {
             Role role = roleRepository.findByRoleName(roleName.toUpperCase())
                     .orElseThrow(() ->
                             new IllegalArgumentException("Role not found: " + roleName)
                     );
-            roles.add(role);
+            newRoles.add(role);
         }
 
-        // Assign the roles to the existing client
-        client.getRoleSet().addAll(roles);
+        // Add the new roles to existing ones (not replace!)
+        client.getRoleSet().addAll(newRoles);
+
+        log.info("After adding roles: {}",
+                client.getRoleSet().stream()
+                        .map(Role::getRoleName)
+                        .toList());
 
         // Save
         return clientRepository.save(client);
