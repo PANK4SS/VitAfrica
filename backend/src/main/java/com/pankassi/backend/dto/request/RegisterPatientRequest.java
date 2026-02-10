@@ -16,5 +16,13 @@ public record RegisterPatientRequest(
         @NotBlank(message = "Password is required")
         String password,
 
-       
+        // --- Patient Fields for backend ---
+        @NotBlank(message = "Phone is required")
+        String phone,
+
+        @NotBlank(message = "Address is required")
+        String locationAddress,
+
+        @NotBlank(message = "Profile pic URL is required")
+        String profilePicUrl
 ) {}
