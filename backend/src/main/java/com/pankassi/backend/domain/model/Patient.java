@@ -28,6 +28,13 @@ public class Patient {
 
     @Column(nullable = false)
     private String locationAddress;
-    
+
+    @OneToOne
+    @JoinColumn(
+            name = "client_id",
+            nullable = false,
+            unique = true
+    )
+    private Client client;
 
 }
