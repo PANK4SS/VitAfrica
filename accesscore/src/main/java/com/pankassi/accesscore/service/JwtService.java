@@ -88,4 +88,21 @@ public class JwtService {
                 .getBody()
                 .getExpiration();
     }
+
+
+    // Méthode utilitaire pour extraire les rôles/permissions (authorities) depuis le token
+    @SuppressWarnings("unchecked")
+    public List<SimpleGrantedAuthority> extractAuthorities(String token) {
+        Claims claims = Jwts.parserBuilder()
+                .setSigningKey(getSigningKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+        
+        List<String> authorities = (List<String>) claims.get("authorities");
+        
+        return authorities.stream()
+                .map(SimpleGrantedAuthority::new)
+                .collect(Collectors.toList());
+    }
 }
