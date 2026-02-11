@@ -50,6 +50,30 @@ public class AuthenticationService {
         return clientRepository.save(client);
     }
 
+    public Client registerClient(ClientRequest clientRequest, String specificRoleName){
+        
+        // Role to use decision : parameter's role or default role
+        String roleNameToUse = (specificRoleName != null) ? specificRoleName : defaultRoleName;
+
+        if(clientRepository.existsByEmail(clientRequest.email())){
+            throw new IllegalStateException("The provided email is already used");
+        }
+
+        // Specific role searching (ex: "PATIENT", "ADMIN")
+        Role role = roleRepository.findByRoleName(roleNameToUse)
+                .orElseThrow(() -> new IllegalStateException(
+                        "Role not found: " + roleNameToUse
+                ));
+
+        Client client = new Client();
+        client.setClientName(clientRequest.username());
+        client.setEmail(clientRequest.email());
+        client.setPassword(passwordEncoder.encode(clientRequest.password()));
+        client.setRoleSet(Set.of(role));
+
+        return clientRepository.save(client);
+    }
+
 
     public AuthenticationResponse login(LoginRequest request) {
         // 1. Trouver le client
