@@ -1,5 +1,7 @@
 package com.pankassi.backend.controller.mobile;
 
+import com.pankassi.accesscore.dto.request.LoginRequest;
+import com.pankassi.accesscore.dto.response.AuthenticationResponse;
 import com.pankassi.accesscore.dto.response.ClientResponse;
 import com.pankassi.backend.dto.request.RegisterPatientRequest;
 import com.pankassi.backend.service.PatientService;
@@ -22,5 +24,12 @@ public class PatientController {
     public ResponseEntity<ClientResponse> registerPatient(@Valid @RequestBody RegisterPatientRequest request) {
         ClientResponse response = patientService.registerPatient(request,"PATIENT");
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+
+    @PostMapping("/login")
+    public ResponseEntity<AuthenticationResponse> loginPatient(@Valid @RequestBody LoginRequest request) {
+        AuthenticationResponse response = patientService.loginPatient(request);
+        return ResponseEntity.ok(response);
     }
 }
