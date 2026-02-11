@@ -43,4 +43,7 @@ public class Patient {
     @Builder.Default
     private List<VitalSign> vitalSignsList = new ArrayList<>();
 
+    @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<Appointment> appointments = new ArrayList<>();
 }
