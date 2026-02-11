@@ -38,4 +38,7 @@ public class PatientService {
         return ClientResponse.from(newClient);
     }
 
+    //Login Patient
+    
+
 }
