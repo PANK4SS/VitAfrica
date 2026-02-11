@@ -5,6 +5,9 @@ import com.pankassi.accesscore.domain.model.Client;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Getter
 @Setter
@@ -36,5 +39,9 @@ public class Patient {
             unique = true
     )
     private Client client;
+
+    @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<VitalSigns> vitalSignsList = new ArrayList<>();
 
 }
