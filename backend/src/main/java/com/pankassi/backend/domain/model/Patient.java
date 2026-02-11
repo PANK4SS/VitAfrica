@@ -1,6 +1,5 @@
 package com.pankassi.backend.domain.model;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.pankassi.accesscore.domain.model.Client;
 import jakarta.persistence.*;
 import lombok.*;
@@ -42,6 +41,6 @@ public class Patient {
 
     @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
-    private List<VitalSigns> vitalSignsList = new ArrayList<>();
+    private List<VitalSign> vitalSignsList = new ArrayList<>();
 
 }
