@@ -134,6 +134,8 @@
 							<artifactId>lombok</artifactId>
 						</exclude>
 					</excludes>
+
+					<classifier>exec</classifier>// This will create an executable jar with the suffix -exec.jar
 				</configuration>
 			</plugin>
 		</plugins>
