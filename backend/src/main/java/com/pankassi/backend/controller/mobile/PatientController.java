@@ -4,15 +4,14 @@ import com.pankassi.accesscore.dto.request.LoginRequest;
 import com.pankassi.accesscore.dto.response.AuthenticationResponse;
 import com.pankassi.accesscore.dto.response.ClientResponse;
 import com.pankassi.backend.dto.request.RegisterPatientRequest;
+import com.pankassi.backend.dto.response.MobileHomeResponse;
 import com.pankassi.backend.service.PatientService;
 import lombok.RequiredArgsConstructor;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/patients/mobile")
@@ -31,5 +30,12 @@ public class PatientController {
     public ResponseEntity<AuthenticationResponse> loginPatient(@Valid @RequestBody LoginRequest request) {
         AuthenticationResponse response = patientService.loginPatient(request);
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/home")
+    @PreAuthorize("hasRole('PATIENT')") // Only Patient can see that data
+    public ResponseEntity<MobileHomeResponse> getHome() {
+        MobileHomeResponse homeInfo = patientService.getMobileHomeInfo();
+        return ResponseEntity.ok(homeInfo);
     }
 }
