@@ -19,7 +19,7 @@ public class VitalSigns {
     @Column(name = "vitalSignId")
     private Long vitalSignId;
 
-    @Column(name = "bloodPressure")
+    @Column(name = "blood_pressure")
     private String bloodPressure;
 
     @Column(name = "heart_rate")
