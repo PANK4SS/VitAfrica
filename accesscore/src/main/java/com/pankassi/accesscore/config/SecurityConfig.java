@@ -11,11 +11,11 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
 
 @Configuration
 @EnableWebSecurity
-// On retire @EnableMethodSecurity pour éviter l'erreur de compilation pour l'instant.
-// Notre sécurité est gérée par le Filtre JWT.
 @RequiredArgsConstructor
 public class SecurityConfig {
 
@@ -28,23 +28,30 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        // Configuration CORS pour autoriser Swagger
+        CorsConfigurationSource source = request -> new CorsConfiguration().applyPermitDefaultValues();
+        CorsConfiguration corsConfiguration = new CorsConfiguration();
+        corsConfiguration.applyPermitDefaultValues();
+
         http
-                .csrf(csrf -> csrf.disable())
+                .csrf(csrf -> csrf.disable()) // CSRF désactivé pour les APIs REST
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .cors(cors -> cors.configurationSource(source)) // ACTIVER CORS ICI
                 .authorizeHttpRequests(auth -> auth
-                        // 1. Public Access (Login / Register)
+                        // Public Endpoints
                         .requestMatchers("/api/clients/login", "/api/clients/register").permitAll()
 
-                        // 2. Public Access (Backend Mobile endpoints)
-                        .requestMatchers("/api/patients/**/register", "/api/patients/**/login").permitAll()
+                        // Public Mobile Endpoints
+                        .requestMatchers("/api/patients/mobile/register").permitAll()
+                        .requestMatchers("/api/patients/mobile/login").permitAll()
+                        .requestMatchers("/api/patients/mobile/home").permitAll() // Home est publique pour l'instant ? Si tu veux, retire ça.
 
-                        // 3. Public Access (Swagger)
+                        // Swagger (Public)
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
 
-                        // 4. Protected (JWT Token required)
+                        // Tout le reste protégé
                         .anyRequest().authenticated()
                 )
-                // 5. Add JWT Filter
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
