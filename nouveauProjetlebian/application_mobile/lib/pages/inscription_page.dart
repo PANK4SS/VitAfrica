@@ -10,6 +10,7 @@ class InscriptionPage extends StatefulWidget {
 class _InscriptionPageState extends State<InscriptionPage> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
+  final _emailController = TextEditingController();
   final _phoneController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
@@ -20,6 +21,7 @@ class _InscriptionPageState extends State<InscriptionPage> {
   @override
   void dispose() {
     _nameController.dispose();
+    _emailController.dispose();
     _phoneController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
@@ -118,6 +120,40 @@ class _InscriptionPageState extends State<InscriptionPage> {
                         controller: _nameController,
                         decoration: InputDecoration(
                           hintText: 'Ex: Sarah Kabore',
+                          hintStyle: TextStyle(
+                            color: Colors.grey[400],
+                            fontSize: 16,
+                          ),
+                          filled: true,
+                          fillColor: Colors.grey[50],
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide.none,
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 16,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+
+                      // Email
+                      const Text(
+                        'EMAIL',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.grey,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      TextFormField(
+                        controller: _emailController,
+                        keyboardType: TextInputType.emailAddress,
+                        decoration: InputDecoration(
+                          hintText: 'exemple@email.com',
                           hintStyle: TextStyle(
                             color: Colors.grey[400],
                             fontSize: 16,
@@ -271,7 +307,37 @@ class _InscriptionPageState extends State<InscriptionPage> {
                         height: 56,
                         child: ElevatedButton(
                           onPressed: () {
-                            Navigator.pushReplacementNamed(context, '/home');
+                            if (_nameController.text.isNotEmpty &&
+                                _emailController.text.isNotEmpty &&
+                                _phoneController.text.isNotEmpty &&
+                                _passwordController.text.isNotEmpty &&
+                                _confirmPasswordController.text.isNotEmpty) {
+                              if (_passwordController.text ==
+                                  _confirmPasswordController.text) {
+                                Navigator.pushReplacementNamed(
+                                  context,
+                                  '/home',
+                                );
+                              } else {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text(
+                                      'Les mots de passe ne correspondent pas',
+                                    ),
+                                    backgroundColor: Colors.red,
+                                  ),
+                                );
+                              }
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text(
+                                    'Veuillez remplir tous les champs',
+                                  ),
+                                  backgroundColor: Colors.red,
+                                ),
+                              );
+                            }
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xFFB4FF00),

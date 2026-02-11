@@ -8,13 +8,13 @@ class ConnexionPage extends StatefulWidget {
 }
 
 class _ConnexionPageState extends State<ConnexionPage> {
-  final _phoneController = TextEditingController();
+  final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
 
   @override
   void dispose() {
-    _phoneController.dispose();
+    _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
@@ -131,18 +131,18 @@ class _ConnexionPageState extends State<ConnexionPage> {
                       ),
                       const SizedBox(height: 25),
 
-                      // Phone Number Field
+                      // Email Field
                       TextField(
-                        controller: _phoneController,
-                        keyboardType: TextInputType.phone,
+                        controller: _emailController,
+                        keyboardType: TextInputType.emailAddress,
                         decoration: InputDecoration(
-                          hintText: 'Numéro de téléphone',
+                          hintText: 'Adresse email',
                           hintStyle: TextStyle(
                             color: Colors.grey[400],
                             fontSize: 16,
                           ),
                           prefixIcon: Icon(
-                            Icons.phone_outlined,
+                            Icons.email_outlined,
                             color: Colors.grey[400],
                           ),
                           filled: true,
@@ -206,7 +206,19 @@ class _ConnexionPageState extends State<ConnexionPage> {
                         height: 56,
                         child: ElevatedButton(
                           onPressed: () {
-                            Navigator.pushReplacementNamed(context, '/home');
+                            if (_emailController.text.isNotEmpty &&
+                                _passwordController.text.isNotEmpty) {
+                              Navigator.pushReplacementNamed(context, '/home');
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text(
+                                    'Veuillez remplir tous les champs',
+                                  ),
+                                  backgroundColor: Colors.red,
+                                ),
+                              );
+                            }
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xFF0A1647),
