@@ -1,15 +1,21 @@
 package com.pankassi.backend.dto.response;
 
-import java.time.LocalDateTime;
-import java.util.List;
-
 public record MobileHomeResponse(
+        //===== PROFILE =====
         String userName,
         String profilePic,
-        String date,   // The appointment date
-        String hour,   // The appointment hour
+
+        //===== APPOINTMENT =====
+        String date,
+        String hour,
         String appointmentStatus,
         String doctorName,
         String doctorDepartment,
-        List<String> vitalSignsConstants
+
+        //===== VITAL SIGNS =====
+        String bloodPressure,
+        String heartRate,
+        String temperature,
+        String weight,
+        String dateMeasured
 ) {}
