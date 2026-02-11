@@ -2,6 +2,8 @@ package com.pankassi.backend.service;
 
 import com.pankassi.accesscore.domain.model.Client;
 import com.pankassi.accesscore.dto.request.ClientRequest;
+import com.pankassi.accesscore.dto.request.LoginRequest;
+import com.pankassi.accesscore.dto.response.AuthenticationResponse;
 import com.pankassi.accesscore.dto.response.ClientResponse;
 import com.pankassi.accesscore.service.AuthenticationService;
 import com.pankassi.backend.domain.model.Patient;
@@ -39,6 +41,8 @@ public class PatientService {
     }
 
     //Login Patient
-
+    public AuthenticationResponse loginPatient(LoginRequest loginRequest){
+        return authenticationService.login(loginRequest);
+    }
 
 }
