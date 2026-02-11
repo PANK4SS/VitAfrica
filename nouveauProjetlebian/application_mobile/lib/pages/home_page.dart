@@ -110,166 +110,67 @@ class _HomePageState extends State<HomePage>
     return Scaffold(
       backgroundColor: Colors.grey[50],
       body: SafeArea(
-        child: Stack(
-          children: [
-            Column(
-              children: [
-                // Header
-                Padding(
-                  padding: const EdgeInsets.all(20.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      GestureDetector(
-                        onTap: _handleBonjourTap,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Bonjour,',
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: Colors.grey[600],
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            const Text(
-                              'Sarah Kabore',
-                              style: TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      // Profile Avatar
-                      Stack(
-                        children: [
-                          CircleAvatar(
-                            radius: 25,
-                            backgroundColor: Colors.grey[300],
-                            child: const Icon(
-                              Icons.person,
-                              color: Colors.white,
-                              size: 30,
-                            ),
-                          ),
-                          Positioned(
-                            bottom: 0,
-                            right: 0,
-                            child: Container(
-                              width: 14,
-                              height: 14,
-                              decoration: BoxDecoration(
-                                color: Colors.green,
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  color: Colors.white,
-                                  width: 2,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-
-                // Appointment Card
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                  child: Container(
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [Color(0xFF0A1647), Color(0xFF1a2668)],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    padding: const EdgeInsets.all(20),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+        child: SingleChildScrollView(
+          child: Stack(
+            children: [
+              Column(
+                children: [
+                  // Header
+                  Padding(
+                    padding: const EdgeInsets.all(20.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 12,
-                                vertical: 6,
-                              ),
-                              decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.2),
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              child: const Text(
-                                'Prochain RDV',
+                        GestureDetector(
+                          onTap: _handleBonjourTap,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Bonjour,',
                                 style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 12,
-                                ),
-                              ),
-                            ),
-                            Container(
-                              padding: const EdgeInsets.all(8),
-                              decoration: BoxDecoration(
-                                color: Colors.green,
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: const Icon(
-                                Icons.card_giftcard,
-                                color: Colors.white,
-                                size: 20,
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 20),
-                        const Text(
-                          'Lun. 12 Fév',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 28,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'à 10:30 avec Dr. Ouedraogo',
-                          style: TextStyle(
-                            color: Colors.white.withOpacity(0.9),
-                            fontSize: 16,
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-                        Row(
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(8),
-                              decoration: BoxDecoration(
-                                color: Colors.yellow[700],
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: const Text(
-                                'Dr',
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold,
                                   fontSize: 14,
+                                  color: Colors.grey[600],
                                 ),
                               ),
-                            ),
-                            const SizedBox(width: 12),
-                            const Text(
-                              'Cardiologie',
-                              style: TextStyle(
+                              const SizedBox(height: 4),
+                              const Text(
+                                'Sarah Kabore',
+                                style: TextStyle(
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        // Profile Avatar
+                        Stack(
+                          children: [
+                            CircleAvatar(
+                              radius: 25,
+                              backgroundColor: const Color(0xFF0A1647),
+                              child: const Icon(
+                                Icons.person,
                                 color: Colors.white,
-                                fontSize: 16,
+                                size: 30,
+                              ),
+                            ),
+                            Positioned(
+                              bottom: 0,
+                              right: 0,
+                              child: Container(
+                                width: 14,
+                                height: 14,
+                                decoration: BoxDecoration(
+                                  color: Colors.green,
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                    color: Colors.white,
+                                    width: 2,
+                                  ),
+                                ),
                               ),
                             ),
                           ],
@@ -277,145 +178,260 @@ class _HomePageState extends State<HomePage>
                       ],
                     ),
                   ),
-                ),
 
-                const SizedBox(height: 30),
-
-                // Menu Rapide Section
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'Menu Rapide',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black,
+                  // Appointment Card
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                    child: Container(
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          colors: [Color(0xFF0A1647), Color(0xFF1a2668)],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
                         ),
+                        borderRadius: BorderRadius.circular(20),
                       ),
-                      const SizedBox(height: 16),
-                      Row(
+                      padding: const EdgeInsets.all(20),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Expanded(
-                            child: _buildMenuCard(
-                              icon: Icons.calendar_today,
-                              label: 'Mes RDV',
-                              color: const Color(0xFF5B4CFF),
-                              onTap: () => Navigator.pushNamed(context, '/rdv'),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 6,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withOpacity(0.2),
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                child: const Text(
+                                  'Prochain RDV',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ),
+                              Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  color: Colors.green,
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: const Icon(
+                                  Icons.card_giftcard,
+                                  color: Colors.white,
+                                  size: 20,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 20),
+                          const Text(
+                            'Lun. 12 Fév',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 28,
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: _buildMenuCard(
-                              icon: Icons.medication,
-                              label: 'Ordonnances',
-                              color: const Color(0xFF00C896),
-                              onTap: () =>
-                                  Navigator.pushNamed(context, '/ordonnances'),
+                          const SizedBox(height: 8),
+                          Text(
+                            'à 10:30 avec Dr. Ouedraogo',
+                            style: TextStyle(
+                              color: Colors.white.withOpacity(0.9),
+                              fontSize: 16,
                             ),
+                          ),
+                          const SizedBox(height: 20),
+                          Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  color: Colors.yellow[700],
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: const Text(
+                                  'Dr',
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              const Text(
+                                'Cardiologie',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),
-                      const SizedBox(height: 16),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: _buildMenuCard(
-                              icon: Icons.description,
-                              label: 'Résultats',
-                              color: const Color(0xFF9747FF),
-                              onTap: () =>
-                                  Navigator.pushNamed(context, '/resultats'),
-                            ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 30),
+
+                  // Dernières Constantes Section
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Dernières Constantes',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
                           ),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: _buildMenuCard(
-                              icon: Icons.person_outline,
-                              label: 'Profil',
-                              color: const Color(0xFF6B7280),
-                              onTap: () =>
-                                  Navigator.pushNamed(context, '/profile'),
-                            ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          '-- 08 Février 2026',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey[600],
                           ),
-                        ],
-                      ),
-                    ],
+                        ),
+                        const SizedBox(height: 16),
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(16),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.05),
+                                blurRadius: 10,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: Column(
+                            children: [
+                              _buildConstantItem(
+                                icon: Icons.favorite,
+                                label: 'Tension Artérielle',
+                                value: '120/80 mmHg',
+                                color: Colors.red,
+                              ),
+                              _buildDivider(),
+                              _buildConstantItem(
+                                icon: Icons.monitor_heart,
+                                label: 'Fréquence cardiaque',
+                                value: '72 bpm',
+                                color: Colors.pink,
+                              ),
+                              _buildDivider(),
+                              _buildConstantItem(
+                                icon: Icons.thermostat,
+                                label: 'Température',
+                                value: '36.8°C',
+                                color: Colors.orange,
+                              ),
+                              _buildDivider(),
+                              _buildConstantItem(
+                                icon: Icons.monitor_weight,
+                                label: 'Poids',
+                                value: '65 kg',
+                                color: Colors.blue,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  // Bottom Navigation
+                  const BottomNavigation(activeIndex: 0),
+                ],
+              ),
+
+              // Confetti Animation when Easter Egg is activated
+              if (_easterEggActivated)
+                IgnorePointer(
+                  child: AnimatedBuilder(
+                    animation: _confettiController,
+                    builder: (context, child) {
+                      return CustomPaint(
+                        painter: ConfettiPainter(_confettiController.value),
+                        size: MediaQuery.of(context).size,
+                      );
+                    },
                   ),
                 ),
-
-                const Spacer(),
-
-                // Bottom Navigation
-                const BottomNavigation(activeIndex: 0),
-              ],
-            ),
-
-            // Confetti Animation when Easter Egg is activated
-            if (_easterEggActivated)
-              IgnorePointer(
-                child: AnimatedBuilder(
-                  animation: _confettiController,
-                  builder: (context, child) {
-                    return CustomPaint(
-                      painter: ConfettiPainter(_confettiController.value),
-                      size: MediaQuery.of(context).size,
-                    );
-                  },
-                ),
-              ),
-          ],
+            ],
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildMenuCard({
+  Widget _buildConstantItem({
     required IconData icon,
     required String label,
+    required String value,
     required Color color,
-    VoidCallback? onTap,
   }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        height: 100,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 10,
-              offset: const Offset(0, 2),
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(10),
             ),
-          ],
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: color.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Icon(icon, color: color, size: 28),
+            child: Icon(icon, color: color, size: 24),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey[600],
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  value,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(height: 8),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.grey[800],
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
+    );
+  }
+
+  Widget _buildDivider() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      child: Divider(height: 1, thickness: 1, color: Colors.grey[200]),
     );
   }
 }

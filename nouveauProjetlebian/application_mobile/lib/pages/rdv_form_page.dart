@@ -60,13 +60,16 @@ class _RdvFormPageState extends State<RdvFormPage>
       ),
       body: TabBarView(
         controller: _tabController,
-        children: [_buildRdvForm(), _buildHistory()],
+        children: [
+          SingleChildScrollView(child: _buildRdvForm()),
+          SingleChildScrollView(child: _buildHistory()),
+        ],
       ),
     );
   }
 
   Widget _buildRdvForm() {
-    return SingleChildScrollView(
+    return Padding(
       padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -286,7 +289,7 @@ class _RdvFormPageState extends State<RdvFormPage>
   }
 
   Widget _buildHistory() {
-    return SingleChildScrollView(
+    return Padding(
       padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
