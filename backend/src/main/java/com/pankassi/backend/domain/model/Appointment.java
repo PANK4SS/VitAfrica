@@ -23,6 +23,9 @@ public class Appointment {
     @Column(name = "date_time", nullable = false)
     private LocalDateTime dateTime;
 
+    @Column(name = "status", nullable = false)
+    private String status;
+
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "patient_id", nullable = false)
