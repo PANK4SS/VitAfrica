@@ -20,7 +20,7 @@ public class LabResult {
     private Long labResultId;
 
     @Column(name = "file_name", nullable = false)
-    private String fileName;            
+    private String fileName;
 
     @Column(name = "file_url", nullable = false)
     private String fileUrl;
@@ -29,6 +29,6 @@ public class LabResult {
     private LocalDateTime uploadedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "patient_id", nullable = false)
+    @JoinColumn(name = "patientId", nullable = false)
     private Patient patient;
 }
