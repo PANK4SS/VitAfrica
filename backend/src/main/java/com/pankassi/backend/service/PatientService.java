@@ -10,21 +10,15 @@ import com.pankassi.backend.domain.model.Appointment;
 import com.pankassi.backend.domain.model.Doctor;
 import com.pankassi.backend.domain.model.Patient;
 import com.pankassi.backend.domain.model.VitalSign;
-import com.pankassi.backend.domain.repository.MedicalPrescriptionRepository;
-import com.pankassi.backend.domain.repository.PatientRepository;
-import com.pankassi.backend.domain.repository.VitalSignRepository;
+import com.pankassi.backend.domain.repository.*;
 import com.pankassi.backend.dto.request.RegisterPatientRequest;
-import com.pankassi.backend.dto.response.AppointmentResponse;
-import com.pankassi.backend.dto.response.DrugResponse;
-import com.pankassi.backend.dto.response.MobileHomeResponse;
-import com.pankassi.backend.dto.response.PrescriptionResponse;
+import com.pankassi.backend.dto.response.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.pankassi.accesscore.domain.repository.ClientRepository;
-import com.pankassi.backend.domain.repository.AppointmentRepository;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -42,6 +36,8 @@ public class PatientService {
     private final ClientRepository clientRepository;
     private final AppointmentRepository appointmentRepository;
     private final VitalSignRepository vitalSignRepository;
+
+    private final LabResultRepository labResultRepository;
 
     //Patient Registration
     public ClientResponse registerPatient (RegisterPatientRequest registerPatientRequest,String roleName){
@@ -68,6 +64,21 @@ public class PatientService {
     //Login Patient
     public AuthenticationResponse loginPatient(LoginRequest loginRequest){
         return authenticationService.login(loginRequest);
+    }
+
+    // Méthode privée utilitaire — à réutiliser dans toutes les méthodes du service
+    private Patient getAuthenticatedPatient() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new IllegalStateException("User not authenticated");
+        }
+
+        Client client = clientRepository.findByEmail(authentication.getName())
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        return patientRepository.findByClient(client)
+                .orElseThrow(() -> new IllegalArgumentException("Patient profile not found"));
     }
 
     public MobileHomeResponse getMobileHomeInfo(){
@@ -212,5 +223,43 @@ public class PatientService {
                                 .toList()
                 ))
                 .toList();
+    }
+
+
+    // ===== LAB RESULTS =====
+    public List<LabResultResponse> getPatientLabResults() {
+        Patient patient = getAuthenticatedPatient();
+
+        return labResultRepository
+                .findByPatientOrderByUploadedAtDesc(patient)
+                .stream()
+                .map(lab -> new LabResultResponse(
+                        lab.getLabResultId(),
+                        lab.getFileName(),
+                        lab.getFileUrl(),
+                        lab.getUploadedAt()
+                                .format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"))
+                ))
+                .toList();
+    }
+
+    // ===== PROFILE =====
+    public PatientProfileResponse getPatientProfile() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+
+        Client client = clientRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        Patient patient = patientRepository.findByClient(client)
+                .orElseThrow(() -> new IllegalArgumentException("Patient profile not found"));
+
+        return new PatientProfileResponse(
+                patient.getProfilePicUrl(),
+                client.getClientName(),
+                client.getEmail(),
+                patient.getPhone(),
+                patient.getLocationAddress()
+        );
     }
 }
