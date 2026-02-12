@@ -66,6 +66,9 @@ public class PatientService {
         }
         String email = authentication.getName();
 
-       
+        //Client Extracting (will be use for Username collection)
+        Client client = clientRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
     }
 }
