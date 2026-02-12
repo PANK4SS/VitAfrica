@@ -70,5 +70,8 @@ public class PatientService {
         Client client = clientRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
+        //Patient Extracting (will be use dor profilePic collection)
+        Patient patient = patientRepository.findByClient(client)
+                .orElseThrow(() -> new IllegalArgumentException("Patient profile not found"));
     }
 }
