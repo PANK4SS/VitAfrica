@@ -4,9 +4,7 @@ import com.pankassi.accesscore.dto.request.LoginRequest;
 import com.pankassi.accesscore.dto.response.AuthenticationResponse;
 import com.pankassi.accesscore.dto.response.ClientResponse;
 import com.pankassi.backend.dto.request.RegisterPatientRequest;
-import com.pankassi.backend.dto.response.AppointmentResponse;
-import com.pankassi.backend.dto.response.MobileHomeResponse;
-import com.pankassi.backend.dto.response.PrescriptionResponse;
+import com.pankassi.backend.dto.response.*;
 import com.pankassi.backend.service.PatientService;
 import lombok.RequiredArgsConstructor;
 import jakarta.validation.Valid;
@@ -58,5 +56,17 @@ public class PatientController {
     @PreAuthorize("hasRole('PATIENT')")
     public ResponseEntity<List<PrescriptionResponse>> getPrescriptions() {
         return ResponseEntity.ok(patientService.getPatientPrescriptions());
+    }
+
+    @GetMapping("/lab-results")
+    @PreAuthorize("hasRole('PATIENT')")
+    public ResponseEntity<List<LabResultResponse>> getLabResults() {
+        return ResponseEntity.ok(patientService.getPatientLabResults());
+    }
+
+    @GetMapping("/profile")
+    @PreAuthorize("hasRole('PATIENT')")
+    public ResponseEntity<PatientProfileResponse> getProfile() {
+        return ResponseEntity.ok(patientService.getPatientProfile());
     }
 }
