@@ -6,6 +6,7 @@ import com.pankassi.accesscore.dto.response.ClientResponse;
 import com.pankassi.backend.dto.request.RegisterPatientRequest;
 import com.pankassi.backend.dto.response.AppointmentResponse;
 import com.pankassi.backend.dto.response.MobileHomeResponse;
+import com.pankassi.backend.dto.response.PrescriptionResponse;
 import com.pankassi.backend.service.PatientService;
 import lombok.RequiredArgsConstructor;
 import jakarta.validation.Valid;
@@ -22,19 +23,21 @@ import java.util.List;
 public class PatientController {
     private final PatientService patientService;
 
+    // ===== Register =====
     @PostMapping("/register")
     public ResponseEntity<ClientResponse> registerPatient(@Valid @RequestBody RegisterPatientRequest request) {
         ClientResponse response = patientService.registerPatient(request,"PATIENT");
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-
+    // ===== Login =====
     @PostMapping("/login")
     public ResponseEntity<AuthenticationResponse> loginPatient(@Valid @RequestBody LoginRequest request) {
         AuthenticationResponse response = patientService.loginPatient(request);
         return ResponseEntity.ok(response);
     }
 
+    // ===== Home Page =====
     @GetMapping("/home")
     @PreAuthorize("hasRole('PATIENT')") // Only Patient can see that data
     public ResponseEntity<MobileHomeResponse> getHome() {
@@ -42,9 +45,18 @@ public class PatientController {
         return ResponseEntity.ok(homeInfo);
     }
 
+    // ===== Appointments Page =====
     @GetMapping("/appointments")
     @PreAuthorize("hasRole('PATIENT')")
     public ResponseEntity<List<AppointmentResponse>> getAppointments() {
         return ResponseEntity.ok(patientService.getPatientAppointments());
+    }
+
+
+    // ====== Prescription page =====
+    @GetMapping("/prescriptions")
+    @PreAuthorize("hasRole('PATIENT')")
+    public ResponseEntity<List<PrescriptionResponse>> getPrescriptions() {
+        return ResponseEntity.ok(patientService.getPatientPrescriptions());
     }
 }
