@@ -13,6 +13,7 @@ import com.pankassi.backend.domain.model.VitalSign;
 import com.pankassi.backend.domain.repository.PatientRepository;
 import com.pankassi.backend.domain.repository.VitalSignRepository;
 import com.pankassi.backend.dto.request.RegisterPatientRequest;
+import com.pankassi.backend.dto.response.AppointmentResponse;
 import com.pankassi.backend.dto.response.MobileHomeResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
@@ -24,6 +25,7 @@ import com.pankassi.backend.domain.repository.AppointmentRepository;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Optional;
 
 
@@ -140,6 +142,37 @@ public class PatientService {
     }
 
 
+    public List<AppointmentResponse> getPatientAppointments() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new IllegalStateException("User not authenticated");
+        }
+
+        Client client = clientRepository.findByEmail(authentication.getName())
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        Patient patient = patientRepository.findByClient(client)
+                .orElseThrow(() -> new IllegalArgumentException("Patient profile not found"));
+
+        List<Appointment> appointments = appointmentRepository
+                .findByPatientAndStatusInOrderByDateTimeDesc(
+                        patient,
+                        List.of("CONFIRMED", "COMPLETED")
+                );
+
+        return appointments.stream()
+                .map(appointment -> new AppointmentResponse(
+                        appointment.getDateTime().toLocalDate()
+                                .format(DateTimeFormatter.ofPattern("yyyy-MM-dd")),
+                        appointment.getDateTime().toLocalTime()
+                                .format(DateTimeFormatter.ofPattern("HH:mm")),
+                        appointment.getStatus(),
+                        appointment.getDoctor() != null ? appointment.getDoctor().getName() : null,
+                        appointment.getDoctor() != null ? appointment.getDoctor().getDepartment() : null
+                ))
+                .toList();
+    }
 
 
 }
