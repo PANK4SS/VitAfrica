@@ -10,11 +10,14 @@ import com.pankassi.backend.domain.model.Appointment;
 import com.pankassi.backend.domain.model.Doctor;
 import com.pankassi.backend.domain.model.Patient;
 import com.pankassi.backend.domain.model.VitalSign;
+import com.pankassi.backend.domain.repository.MedicalPrescriptionRepository;
 import com.pankassi.backend.domain.repository.PatientRepository;
 import com.pankassi.backend.domain.repository.VitalSignRepository;
 import com.pankassi.backend.dto.request.RegisterPatientRequest;
 import com.pankassi.backend.dto.response.AppointmentResponse;
+import com.pankassi.backend.dto.response.DrugResponse;
 import com.pankassi.backend.dto.response.MobileHomeResponse;
+import com.pankassi.backend.dto.response.PrescriptionResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -34,6 +37,7 @@ import java.util.Optional;
 public class PatientService {
     private final PatientRepository patientRepository;
     private final AuthenticationService authenticationService; // Comes from AccessCore
+    private final MedicalPrescriptionRepository prescriptionRepository;
 
     private final ClientRepository clientRepository;
     private final AppointmentRepository appointmentRepository;
@@ -163,6 +167,7 @@ public class PatientService {
 
         return appointments.stream()
                 .map(appointment -> new AppointmentResponse(
+                        appointment.getAppointmentId(),
                         appointment.getDateTime().toLocalDate()
                                 .format(DateTimeFormatter.ofPattern("yyyy-MM-dd")),
                         appointment.getDateTime().toLocalTime()
@@ -175,4 +180,37 @@ public class PatientService {
     }
 
 
+    public List<PrescriptionResponse> getPatientPrescriptions() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new IllegalStateException("User not authenticated");
+        }
+
+        Client client = clientRepository.findByEmail(authentication.getName())
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        Patient patient = patientRepository.findByClient(client)
+                .orElseThrow(() -> new IllegalArgumentException("Patient profile not found"));
+
+        return prescriptionRepository
+                .findByPatientOrderByPrescriptionDateDesc(patient)
+                .stream()
+                .map(prescription -> new PrescriptionResponse(
+                        prescription.getPrescriptionId(),
+                        prescription.getPrescriptionDate()
+                                .format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),
+                        prescription.getDoctor().getName(),
+                        prescription.getDoctor().getDepartment(),
+                        prescription.getDrugs().stream()
+                                .map(drug -> new DrugResponse(
+                                        drug.getDrugName(),
+                                        drug.getDosage(),
+                                        drug.getFrequency(),
+                                        drug.getDurationDays() + " jours"
+                                ))
+                                .toList()
+                ))
+                .toList();
+    }
 }
