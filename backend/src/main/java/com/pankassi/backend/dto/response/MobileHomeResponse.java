@@ -10,12 +10,12 @@ public record MobileHomeResponse(
         String hour,
         String appointmentStatus,
         String doctorName,
-        String doctorDepartment
+        String doctorDepartment,
 
         //===== VITAL SIGNS =====
-//        String bloodPressure,
-//        String heartRate,
-//        String temperature,
-//        String weight,
-//        String dateMeasured
+        String bloodPressure,
+        String heartRate,
+        String temperature,
+        String weight,
+        String dateMeasured
 ) {}
