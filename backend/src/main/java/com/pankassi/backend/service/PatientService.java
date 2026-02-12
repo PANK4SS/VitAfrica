@@ -7,6 +7,7 @@ import com.pankassi.accesscore.dto.response.AuthenticationResponse;
 import com.pankassi.accesscore.dto.response.ClientResponse;
 import com.pankassi.accesscore.service.AuthenticationService;
 import com.pankassi.backend.domain.model.Appointment;
+import com.pankassi.backend.domain.model.Doctor;
 import com.pankassi.backend.domain.model.Patient;
 import com.pankassi.backend.domain.repository.PatientRepository;
 import com.pankassi.backend.dto.request.RegisterPatientRequest;
@@ -19,6 +20,8 @@ import org.springframework.stereotype.Service;
 import com.pankassi.accesscore.domain.repository.ClientRepository;
 import com.pankassi.backend.domain.repository.AppointmentRepository;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
 
@@ -73,5 +76,32 @@ public class PatientService {
         //Patient Extracting (will be use dor profilePic collection)
         Patient patient = patientRepository.findByClient(client)
                 .orElseThrow(() -> new IllegalArgumentException("Patient profile not found"));
+
+        //Latest Appointment
+        Optional<Appointment> appointmentOpt = appointmentRepository.findFirstByPatientAndStatusOrderByDateTimeDesc(patient, "CONFIRMED");
+        String date = null;
+        String hour = null;
+        String appointmentStatus = null;
+        String doctorName = null;
+        String doctorDepartment = null;
+        if (appointmentOpt.isPresent()) {
+            Appointment appointment = appointmentOpt.get();
+
+            LocalDateTime dateTime = appointment.getDateTime();
+            date = dateTime.toLocalDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+            hour = dateTime.toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm")); //"HH:mm" for 24h format or "hh:mm a" for 12h format
+
+
+            appointmentStatus = appointment.getStatus();
+
+            if (appointment.getDoctor() != null) {
+                Doctor doctor = appointment.getDoctor();
+                doctorName = doctor.getName(); // ou getFirstName() + getLastName() selon votre modèle
+                doctorDepartment = doctor.getDepartment(); // selon votre modèle Doctor
+            }
+        }
+
+
+        //Latest Vital Constant
     }
 }
