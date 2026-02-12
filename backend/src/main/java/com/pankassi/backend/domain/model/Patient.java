@@ -46,4 +46,8 @@ public class Patient {
     @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<Appointment> appointments = new ArrayList<>();
+
+    @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<MedicalPrescription> prescriptions = new ArrayList<>();
 }
