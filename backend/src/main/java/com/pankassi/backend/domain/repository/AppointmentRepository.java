@@ -13,6 +13,7 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
     // Find last patient appointment filtered by date Desc and status confirmed
     Optional<Appointment> findFirstByPatientAndStatusOrderByDateTimeDesc(Patient patient, String status);
 
-
     List<Appointment> findByPatientAndStatusInOrderByDateTimeDesc(Patient patient, List<String> statuses);
+
+    
 }
