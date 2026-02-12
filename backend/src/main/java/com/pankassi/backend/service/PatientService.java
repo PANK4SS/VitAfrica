@@ -9,7 +9,9 @@ import com.pankassi.accesscore.service.AuthenticationService;
 import com.pankassi.backend.domain.model.Appointment;
 import com.pankassi.backend.domain.model.Doctor;
 import com.pankassi.backend.domain.model.Patient;
+import com.pankassi.backend.domain.model.VitalSign;
 import com.pankassi.backend.domain.repository.PatientRepository;
+import com.pankassi.backend.domain.repository.VitalSignRepository;
 import com.pankassi.backend.dto.request.RegisterPatientRequest;
 import com.pankassi.backend.dto.response.MobileHomeResponse;
 import lombok.RequiredArgsConstructor;
@@ -33,6 +35,7 @@ public class PatientService {
 
     private final ClientRepository clientRepository;
     private final AppointmentRepository appointmentRepository;
+    private final VitalSignRepository vitalSignRepository;
 
     //Patient Registration
     public ClientResponse registerPatient (RegisterPatientRequest registerPatientRequest,String roleName){
@@ -62,46 +65,81 @@ public class PatientService {
     }
 
     public MobileHomeResponse getMobileHomeInfo(){
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();//Collect connected user representing object
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication == null || !authentication.isAuthenticated()) {
             throw new IllegalStateException("User not authenticated");
         }
         String email = authentication.getName();
 
-        //Client Extracting (will be use for Username collection)
+        // Client & Patient
         Client client = clientRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
-        //Patient Extracting (will be use dor profilePic collection)
         Patient patient = patientRepository.findByClient(client)
                 .orElseThrow(() -> new IllegalArgumentException("Patient profile not found"));
 
-        //Latest Appointment
-        Optional<Appointment> appointmentOpt = appointmentRepository.findFirstByPatientAndStatusOrderByDateTimeDesc(patient, "CONFIRMED");
-        String date = null;
-        String hour = null;
-        String appointmentStatus = null;
-        String doctorName = null;
-        String doctorDepartment = null;
+        // ===== APPOINTMENT =====
+        Optional<Appointment> appointmentOpt = appointmentRepository
+                .findFirstByPatientAndStatusOrderByDateTimeDesc(patient, "CONFIRMED");
+
+        String date = null, hour = null, appointmentStatus = null;
+        String doctorName = null, doctorDepartment = null;
+
         if (appointmentOpt.isPresent()) {
             Appointment appointment = appointmentOpt.get();
-
             LocalDateTime dateTime = appointment.getDateTime();
-            date = dateTime.toLocalDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-            hour = dateTime.toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm")); //"HH:mm" for 24h format or "hh:mm a" for 12h format
 
-
+            date              = dateTime.toLocalDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+            hour              = dateTime.toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm"));
             appointmentStatus = appointment.getStatus();
 
             if (appointment.getDoctor() != null) {
                 Doctor doctor = appointment.getDoctor();
-                doctorName = doctor.getName(); // ou getFirstName() + getLastName() selon votre modèle
-                doctorDepartment = doctor.getDepartment(); // selon votre modèle Doctor
+                doctorName       = doctor.getName();
+                doctorDepartment = doctor.getDepartment();
             }
         }
 
+        // ===== VITAL SIGNS =====
+        Optional<VitalSign> vitalSignOpt = vitalSignRepository
+                .findFirstByPatientOrderByDateMeasuredDesc(patient);
 
-        //Latest Vital Constant
+        String bloodPressure = null, heartRate = null;
+        String temperature = null, weight = null, dateMeasured = null;
+
+        if (vitalSignOpt.isPresent()) {
+            VitalSign vitalSign = vitalSignOpt.get();
+
+            bloodPressure = vitalSign.getBloodPressure();
+            heartRate     = String.valueOf(vitalSign.getHeartRate());
+            temperature   = String.valueOf(vitalSign.getTemperature());
+            weight        = String.valueOf(vitalSign.getWeight());
+            dateMeasured  = vitalSign.getDateMeasured()
+                    .format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+        }
+
+        // ===== RETURN =====
+        return new MobileHomeResponse(
+                // PROFILE
+                client.getClientName(),
+                patient.getProfilePicUrl(),
+                // APPOINTMENT
+                date,
+                hour,
+                appointmentStatus,
+                doctorName,
+                doctorDepartment,
+                // VITAL SIGNS
+                bloodPressure,
+                heartRate,
+                temperature,
+                weight,
+                dateMeasured
+        );
     }
+
+
+
+
 }
