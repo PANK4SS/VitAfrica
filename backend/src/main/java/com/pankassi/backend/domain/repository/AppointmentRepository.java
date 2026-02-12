@@ -9,7 +9,6 @@ import java.util.Optional;
 
 @Repository
 public interface AppointmentRepository extends JpaRepository<Appointment, Long> {
-
-    // Find last patient appointment filterd by date Desc
-    Optional<Appointment> findFirstByPatientOrderByDateTimeDesc(Patient patient);
+    // Find last patient appointment filtered by date Desc and status confirmed
+    Optional<Appointment> findFirstByPatientAndStatusOrderByDateTimeDesc(Patient patient, String status);
 }
