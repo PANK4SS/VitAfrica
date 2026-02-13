@@ -376,9 +376,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     radius: 50,
                     backgroundImage: _profileImage != null
                         ? FileImage(_profileImage!)
-                        : const AssetImage('assets/images/Profile.png')
-                              as ImageProvider,
+                        : null,
                     backgroundColor: Colors.grey[200],
+                    child: _profileImage == null
+                        ? Icon(Icons.person, size: 40, color: Colors.grey[400])
+                        : null,
                   ),
                   Positioned(
                     bottom: 0,

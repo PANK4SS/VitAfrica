@@ -194,15 +194,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               border: Border.all(color: AppColors.secondary, width: 3),
-              image: DecorationImage(
-                image:
-                    profile.profilePicUrl != null &&
-                        profile.profilePicUrl!.isNotEmpty
-                    ? NetworkImage(profile.profilePicUrl!) as ImageProvider
-                    : const AssetImage('assets/images/Profile.png'),
-                fit: BoxFit.cover,
-              ),
+              color: Colors.white.withOpacity(0.2),
+              image:
+                  profile.profilePicUrl != null &&
+                      profile.profilePicUrl!.isNotEmpty
+                  ? DecorationImage(
+                      image: NetworkImage(profile.profilePicUrl!),
+                      fit: BoxFit.cover,
+                    )
+                  : null,
             ),
+            child:
+                profile.profilePicUrl == null || profile.profilePicUrl!.isEmpty
+                ? const Icon(Icons.person, size: 50, color: Colors.white70)
+                : null,
           ),
           const SizedBox(height: 16),
           Text(

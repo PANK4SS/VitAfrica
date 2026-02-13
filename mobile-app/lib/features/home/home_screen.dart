@@ -154,14 +154,17 @@ class _HomeScreenState extends State<HomeScreen> {
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             border: Border.all(color: AppColors.secondary, width: 2.5),
-            image: DecorationImage(
-              image:
-                  data.profilePicUrl != null && data.profilePicUrl!.isNotEmpty
-                  ? NetworkImage(data.profilePicUrl!) as ImageProvider
-                  : const AssetImage('assets/images/Profile.png'),
-              fit: BoxFit.cover,
-            ),
+            color: Colors.grey[200],
+            image: data.profilePicUrl != null && data.profilePicUrl!.isNotEmpty
+                ? DecorationImage(
+                    image: NetworkImage(data.profilePicUrl!),
+                    fit: BoxFit.cover,
+                  )
+                : null,
           ),
+          child: data.profilePicUrl == null || data.profilePicUrl!.isEmpty
+              ? Icon(Icons.person, size: 28, color: Colors.grey[400])
+              : null,
         ),
         const SizedBox(width: 14),
         Expanded(

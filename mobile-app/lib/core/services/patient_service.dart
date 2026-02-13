@@ -12,6 +12,9 @@ class PatientService {
     final response = await ApiClient.get(ApiConstants.homeEndpoint);
 
     if (response.statusCode == 200) {
+      if (response.body.isEmpty) {
+        throw Exception('Empty response from server (home)');
+      }
       return HomeResponse.fromJson(jsonDecode(response.body));
     } else {
       throw Exception('Failed to load home data');
@@ -22,6 +25,9 @@ class PatientService {
     final response = await ApiClient.get(ApiConstants.appointmentsEndpoint);
 
     if (response.statusCode == 200) {
+      if (response.body.isEmpty) {
+        throw Exception('Empty response from server (appointments)');
+      }
       return AppointmentResponse.fromJsonList(jsonDecode(response.body));
     } else {
       throw Exception('Failed to load appointments');
@@ -32,6 +38,9 @@ class PatientService {
     final response = await ApiClient.get(ApiConstants.prescriptionsEndpoint);
 
     if (response.statusCode == 200) {
+      if (response.body.isEmpty) {
+        throw Exception('Empty response from server (prescriptions)');
+      }
       return PrescriptionResponse.fromJsonList(jsonDecode(response.body));
     } else {
       throw Exception('Failed to load prescriptions');
@@ -42,6 +51,9 @@ class PatientService {
     final response = await ApiClient.get(ApiConstants.labResultsEndpoint);
 
     if (response.statusCode == 200) {
+      if (response.body.isEmpty) {
+        throw Exception('Empty response from server (lab results)');
+      }
       return LabResultResponse.fromJsonList(jsonDecode(response.body));
     } else {
       throw Exception('Failed to load lab results');
@@ -52,6 +64,9 @@ class PatientService {
     final response = await ApiClient.get(ApiConstants.profileEndpoint);
 
     if (response.statusCode == 200) {
+      if (response.body.isEmpty) {
+        throw Exception('Empty response from server (profile)');
+      }
       return ProfileResponse.fromJson(jsonDecode(response.body));
     } else {
       throw Exception('Failed to load profile');

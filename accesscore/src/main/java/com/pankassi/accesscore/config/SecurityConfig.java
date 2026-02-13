@@ -51,6 +51,10 @@ public class SecurityConfig {
 
                         // Tout le reste protégé
                         .anyRequest().authenticated()
+
+                        .requestMatchers("/api/roles/**").hasRole("DEV_ADMIN")
+                        .requestMatchers("api/resources").hasRole("DEV_ADMIN")
+
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 

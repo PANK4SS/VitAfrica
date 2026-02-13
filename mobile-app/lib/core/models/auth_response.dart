@@ -1,13 +1,22 @@
 class AuthResponse {
-  final String token;
-  final String tokenType;
+  final String accessToken;
+  final String refreshToken;
+  final String email;
+  final String clientName;
 
-  AuthResponse({required this.token, required this.tokenType});
+  AuthResponse({
+    required this.accessToken,
+    required this.refreshToken,
+    required this.email,
+    required this.clientName,
+  });
 
   factory AuthResponse.fromJson(Map<String, dynamic> json) {
     return AuthResponse(
-      token: json['token'] ?? '',
-      tokenType: json['tokenType'] ?? 'Bearer',
+      accessToken: json['accessToken'] ?? '',
+      refreshToken: json['refreshToken'] ?? '',
+      email: json['email'] ?? '',
+      clientName: json['clientName'] ?? '',
     );
   }
 }

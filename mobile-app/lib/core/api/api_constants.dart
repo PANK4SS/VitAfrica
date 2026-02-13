@@ -1,6 +1,8 @@
 class ApiConstants {
-  // Android Emulator → localhost
-  static const String baseUrl = 'http://10.0.2.2:8080/api/mobile/patient';
+  // Base URL for mobile patient API (must match backend controller)
+  // Backend: @RequestMapping("/api/patients/mobile") in PatientController
+  static const String baseUrl =
+      'http://192.168.100.202:8080/api/patients/mobile';
 
   // Auth
   static const String loginEndpoint = '$baseUrl/login';
