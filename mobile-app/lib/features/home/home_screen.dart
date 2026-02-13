@@ -1,63 +1,169 @@
 import 'package:flutter/material.dart';
 import '../../core/theme/colors.dart';
+import '../../core/services/patient_service.dart';
+import '../../core/models/home_response.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  HomeResponse? _homeData;
+  bool _isLoading = true;
+  String? _error;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadData();
+  }
+
+  Future<void> _loadData() async {
+    try {
+      final data = await PatientService.getHome();
+      if (mounted) {
+        setState(() {
+          _homeData = data;
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _error = e.toString().replaceFirst('Exception: ', '');
+          _isLoading = false;
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[50],
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // ===== HEADER =====
-              _buildHeader(),
-              const SizedBox(height: 28),
+        child: _isLoading
+            ? const Center(
+                child: CircularProgressIndicator(color: AppColors.primary),
+              )
+            : _error != null
+            ? _buildErrorState()
+            : _buildContent(),
+      ),
+    );
+  }
 
-              // ===== NEXT APPOINTMENT =====
-              _buildSectionTitle('Next Appointment'),
-              const SizedBox(height: 12),
-              _buildAppointmentCard(),
-              const SizedBox(height: 28),
-
-              // ===== VITAL SIGNS =====
-              _buildSectionTitle('Vital Signs'),
-              const SizedBox(height: 4),
-              Text(
-                'Last measured: 10/02/2026',
-                style: TextStyle(fontSize: 12, color: Colors.grey[500]),
+  Widget _buildErrorState() {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.cloud_off, size: 64, color: Colors.grey[400]),
+            const SizedBox(height: 16),
+            Text(
+              'Unable to load data',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: Colors.grey[700],
               ),
-              const SizedBox(height: 12),
-              _buildVitalSignsGrid(),
-            ],
-          ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              _error!,
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 14, color: Colors.grey[500]),
+            ),
+            const SizedBox(height: 24),
+            ElevatedButton.icon(
+              onPressed: () {
+                setState(() {
+                  _isLoading = true;
+                  _error = null;
+                });
+                _loadData();
+              },
+              icon: const Icon(Icons.refresh, size: 18),
+              label: const Text('Retry'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildContent() {
+    final data = _homeData!;
+    return RefreshIndicator(
+      color: AppColors.primary,
+      onRefresh: _loadData,
+      child: SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // ===== HEADER =====
+            _buildHeader(data),
+            const SizedBox(height: 28),
+
+            // ===== NEXT APPOINTMENT =====
+            _buildSectionTitle('Next Appointment'),
+            const SizedBox(height: 12),
+            data.date != null
+                ? _buildAppointmentCard(data)
+                : _buildEmptyCard('No upcoming appointment'),
+            const SizedBox(height: 28),
+
+            // ===== VITAL SIGNS =====
+            _buildSectionTitle('Vital Signs'),
+            const SizedBox(height: 4),
+            if (data.dateMeasured != null)
+              Text(
+                'Last measured: ${data.dateMeasured}',
+                style: TextStyle(fontSize: 12, color: Colors.grey[500]),
+              ),
+            const SizedBox(height: 12),
+            data.bloodPressure != null
+                ? _buildVitalSignsGrid(data)
+                : _buildEmptyCard('No vital signs recorded'),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHeader(HomeResponse data) {
     return Row(
       children: [
-        // Profile Picture
         Container(
           width: 52,
           height: 52,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             border: Border.all(color: AppColors.secondary, width: 2.5),
-            image: const DecorationImage(
-              image: AssetImage('assets/images/Profile.png'),
+            image: DecorationImage(
+              image:
+                  data.profilePicUrl != null && data.profilePicUrl!.isNotEmpty
+                  ? NetworkImage(data.profilePicUrl!) as ImageProvider
+                  : const AssetImage('assets/images/Profile.png'),
               fit: BoxFit.cover,
             ),
           ),
         ),
         const SizedBox(width: 14),
-        // Greeting
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -66,35 +172,15 @@ class HomeScreen extends StatelessWidget {
                 'Hello,',
                 style: TextStyle(fontSize: 14, color: Colors.grey[600]),
               ),
-              const Text(
-                'Rayane',
-                style: TextStyle(
+              Text(
+                data.clientName ?? 'Patient',
+                style: const TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
                   color: AppColors.primary,
                 ),
               ),
             ],
-          ),
-        ),
-        // Notification Icon
-        Container(
-          padding: const EdgeInsets.all(10),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(14),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.05),
-                blurRadius: 10,
-                offset: const Offset(0, 2),
-              ),
-            ],
-          ),
-          child: const Icon(
-            Icons.notifications_outlined,
-            color: AppColors.primary,
-            size: 22,
           ),
         ),
       ],
@@ -112,7 +198,35 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildAppointmentCard() {
+  Widget _buildEmptyCard(String message) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          Icon(Icons.info_outline, size: 32, color: Colors.grey[400]),
+          const SizedBox(height: 8),
+          Text(
+            message,
+            style: TextStyle(fontSize: 14, color: Colors.grey[500]),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAppointmentCard(HomeResponse data) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -133,16 +247,15 @@ class HomeScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Status badge
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
             decoration: BoxDecoration(
               color: AppColors.secondary,
               borderRadius: BorderRadius.circular(20),
             ),
-            child: const Text(
-              'CONFIRMED',
-              style: TextStyle(
+            child: Text(
+              data.appointmentStatus ?? 'SCHEDULED',
+              style: const TextStyle(
                 fontSize: 11,
                 fontWeight: FontWeight.bold,
                 color: AppColors.primary,
@@ -150,8 +263,6 @@ class HomeScreen extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 16),
-
-          // Doctor info
           Row(
             children: [
               Container(
@@ -164,22 +275,25 @@ class HomeScreen extends StatelessWidget {
                 child: const Icon(Icons.person, color: Colors.white, size: 26),
               ),
               const SizedBox(width: 14),
-              const Expanded(
+              Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Dr. Jean Mukendi',
-                      style: TextStyle(
+                      data.doctorName ?? 'Doctor',
+                      style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                         color: Colors.white,
                       ),
                     ),
-                    SizedBox(height: 2),
+                    const SizedBox(height: 2),
                     Text(
-                      'Cardiologie',
-                      style: TextStyle(fontSize: 13, color: Colors.white70),
+                      data.doctorDepartment ?? '',
+                      style: const TextStyle(
+                        fontSize: 13,
+                        color: Colors.white70,
+                      ),
                     ),
                   ],
                 ),
@@ -187,8 +301,6 @@ class HomeScreen extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 18),
-
-          // Date & Time
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(
@@ -198,9 +310,9 @@ class HomeScreen extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                _buildDateTimeItem(Icons.calendar_today, '2026-02-15'),
+                _buildDateTimeItem(Icons.calendar_today, data.date ?? ''),
                 Container(width: 1, height: 30, color: Colors.white24),
-                _buildDateTimeItem(Icons.access_time, '09:30'),
+                _buildDateTimeItem(Icons.access_time, data.hour ?? ''),
               ],
             ),
           ),
@@ -226,7 +338,7 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildVitalSignsGrid() {
+  Widget _buildVitalSignsGrid(HomeResponse data) {
     return GridView.count(
       crossAxisCount: 2,
       shrinkWrap: true,
@@ -239,28 +351,28 @@ class HomeScreen extends StatelessWidget {
           icon: Icons.favorite,
           iconColor: Colors.red,
           label: 'Blood Pressure',
-          value: '120/80',
+          value: data.bloodPressure ?? '--',
           unit: 'mmHg',
         ),
         _buildVitalCard(
           icon: Icons.monitor_heart,
           iconColor: Colors.pink,
           label: 'Heart Rate',
-          value: '72',
+          value: data.heartRate ?? '--',
           unit: 'bpm',
         ),
         _buildVitalCard(
           icon: Icons.thermostat,
           iconColor: Colors.orange,
           label: 'Temperature',
-          value: '36.5',
+          value: data.temperature ?? '--',
           unit: '°C',
         ),
         _buildVitalCard(
           icon: Icons.fitness_center,
           iconColor: Colors.blue,
           label: 'Weight',
-          value: '75',
+          value: data.weight ?? '--',
           unit: 'kg',
         ),
       ],

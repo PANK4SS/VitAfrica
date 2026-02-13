@@ -1,54 +1,53 @@
 import 'package:flutter/material.dart';
 import '../../core/theme/colors.dart';
+import '../../core/services/patient_service.dart';
+import '../../core/models/lab_result_response.dart';
 
-class LabResultsScreen extends StatelessWidget {
+class LabResultsScreen extends StatefulWidget {
   const LabResultsScreen({super.key});
 
-  // Mock data matching LabResultResponse(id, fileName, fileUrl, uploadedAt)
-  List<Map<String, dynamic>> get _mockLabResults => [
-    {
-      'id': 1,
-      'fileName': 'Bilan Sanguin Complet.pdf',
-      'fileUrl': 'https://example.com/lab1.pdf',
-      'uploadedAt': '10/02/2026 14:30',
-    },
-    {
-      'id': 2,
-      'fileName': 'Analyse Urinaire.pdf',
-      'fileUrl': 'https://example.com/lab2.pdf',
-      'uploadedAt': '25/01/2026 09:15',
-    },
-    {
-      'id': 3,
-      'fileName': 'Glycémie à jeun.pdf',
-      'fileUrl': 'https://example.com/lab3.pdf',
-      'uploadedAt': '15/12/2025 11:00',
-    },
-    {
-      'id': 4,
-      'fileName': 'Radiographie Thorax.pdf',
-      'fileUrl': 'https://example.com/lab4.pdf',
-      'uploadedAt': '01/12/2025 16:45',
-    },
-    {
-      'id': 5,
-      'fileName': 'Échographie Abdominale.pdf',
-      'fileUrl': 'https://example.com/lab5.pdf',
-      'uploadedAt': '10/11/2025 08:20',
-    },
-  ];
+  @override
+  State<LabResultsScreen> createState() => _LabResultsScreenState();
+}
+
+class _LabResultsScreenState extends State<LabResultsScreen> {
+  List<LabResultResponse>? _labResults;
+  bool _isLoading = true;
+  String? _error;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadData();
+  }
+
+  Future<void> _loadData() async {
+    try {
+      final data = await PatientService.getLabResults();
+      if (mounted) {
+        setState(() {
+          _labResults = data;
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _error = e.toString().replaceFirst('Exception: ', '');
+          _isLoading = false;
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    final labResults = _mockLabResults;
-
     return Scaffold(
       backgroundColor: Colors.grey[50],
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
               child: Column(
@@ -64,25 +63,38 @@ class LabResultsScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    '${labResults.length} results',
+                    _isLoading
+                        ? 'Loading...'
+                        : '${_labResults?.length ?? 0} results',
                     style: TextStyle(fontSize: 14, color: Colors.grey[500]),
                   ),
                 ],
               ),
             ),
             const SizedBox(height: 20),
-
-            // List
             Expanded(
-              child: ListView.separated(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                itemCount: labResults.length,
-                separatorBuilder: (_, __) => const SizedBox(height: 12),
-                itemBuilder: (context, index) {
-                  final lab = labResults[index];
-                  return _buildLabResultCard(lab);
-                },
-              ),
+              child: _isLoading
+                  ? const Center(
+                      child: CircularProgressIndicator(
+                        color: AppColors.primary,
+                      ),
+                    )
+                  : _error != null
+                  ? _buildErrorState()
+                  : _labResults!.isEmpty
+                  ? _buildEmptyState()
+                  : RefreshIndicator(
+                      color: AppColors.primary,
+                      onRefresh: _loadData,
+                      child: ListView.separated(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        itemCount: _labResults!.length,
+                        separatorBuilder: (_, __) => const SizedBox(height: 12),
+                        itemBuilder: (context, index) {
+                          return _buildLabResultCard(_labResults![index]);
+                        },
+                      ),
+                    ),
             ),
           ],
         ),
@@ -90,7 +102,59 @@ class LabResultsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildLabResultCard(Map<String, dynamic> lab) {
+  Widget _buildErrorState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.cloud_off, size: 48, color: Colors.grey[400]),
+          const SizedBox(height: 12),
+          Text(_error!, style: TextStyle(color: Colors.grey[600])),
+          const SizedBox(height: 16),
+          ElevatedButton.icon(
+            onPressed: () {
+              setState(() {
+                _isLoading = true;
+                _error = null;
+              });
+              _loadData();
+            },
+            icon: const Icon(Icons.refresh, size: 18),
+            label: const Text('Retry'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.science_outlined, size: 48, color: Colors.grey[400]),
+          const SizedBox(height: 12),
+          Text(
+            'No lab results yet',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: Colors.grey[600],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLabResultCard(LabResultResponse lab) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -106,7 +170,6 @@ class LabResultsScreen extends StatelessWidget {
       ),
       child: Row(
         children: [
-          // File icon
           Container(
             width: 52,
             height: 52,
@@ -121,14 +184,12 @@ class LabResultsScreen extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 14),
-
-          // Info
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  lab['fileName'],
+                  lab.fileName,
                   style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
@@ -143,7 +204,7 @@ class LabResultsScreen extends StatelessWidget {
                     Icon(Icons.access_time, size: 13, color: Colors.grey[500]),
                     const SizedBox(width: 4),
                     Text(
-                      lab['uploadedAt'],
+                      lab.uploadedAt,
                       style: TextStyle(fontSize: 12, color: Colors.grey[500]),
                     ),
                   ],
@@ -151,8 +212,6 @@ class LabResultsScreen extends StatelessWidget {
               ],
             ),
           ),
-
-          // Download button
           Container(
             width: 42,
             height: 42,
@@ -167,7 +226,7 @@ class LabResultsScreen extends StatelessWidget {
                 size: 22,
               ),
               onPressed: () {
-                // TODO: Integrate download logic
+                // TODO: Implement download using lab.fileUrl
               },
             ),
           ),

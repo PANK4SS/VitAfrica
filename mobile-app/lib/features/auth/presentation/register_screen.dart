@@ -1,8 +1,8 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../../core/theme/colors.dart';
+import '../../../core/services/auth_service.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -15,7 +15,25 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
   bool _isPasswordVisible = false;
+  bool _isLoading = false;
   File? _profileImage;
+
+  final _usernameController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _phoneController = TextEditingController();
+  final _locationController = TextEditingController();
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    _usernameController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    _phoneController.dispose();
+    _locationController.dispose();
+    super.dispose();
+  }
 
   Future<void> _pickImage() async {
     final ImagePicker picker = ImagePicker();
@@ -29,6 +47,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   void _nextPage() {
+    // Validate step 1
+    if (_usernameController.text.trim().isEmpty ||
+        _emailController.text.trim().isEmpty ||
+        _passwordController.text.trim().isEmpty) {
+      _showError('Please fill in all fields');
+      return;
+    }
+
     if (_currentPage < 1) {
       _pageController.nextPage(
         duration: const Duration(milliseconds: 300),
@@ -52,6 +78,58 @@ class _RegisterScreenState extends State<RegisterScreen> {
     } else {
       Navigator.of(context).pop();
     }
+  }
+
+  Future<void> _handleRegister() async {
+    if (_phoneController.text.trim().isEmpty ||
+        _locationController.text.trim().isEmpty) {
+      _showError('Please fill in all fields');
+      return;
+    }
+
+    setState(() => _isLoading = true);
+
+    try {
+      await AuthService.register(
+        username: _usernameController.text.trim(),
+        email: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
+        phone: _phoneController.text.trim(),
+        locationAddress: _locationController.text.trim(),
+        profilePicUrl: _profileImage?.path,
+      );
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('Account created successfully! Please login.'),
+            backgroundColor: Colors.green,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+          ),
+        );
+        Navigator.of(context).pop(); // Back to login
+      }
+    } catch (e) {
+      if (mounted) {
+        _showError(e.toString().replaceFirst('Exception: ', ''));
+      }
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  void _showError(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.red,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      ),
+    );
   }
 
   @override
@@ -93,7 +171,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Back Button
                       SafeArea(
                         child: GestureDetector(
                           onTap: () => Navigator.of(context).pop(),
@@ -150,7 +227,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  // Login Link
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -196,9 +272,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ),
           ),
           const SizedBox(height: 24),
-
-          // Username
           TextField(
+            controller: _usernameController,
             decoration: InputDecoration(
               prefixIcon: const Icon(Icons.person_outline, color: Colors.grey),
               hintText: 'Username',
@@ -212,9 +287,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ),
           ),
           const SizedBox(height: 16),
-
-          // Email
           TextField(
+            controller: _emailController,
             keyboardType: TextInputType.emailAddress,
             decoration: InputDecoration(
               prefixIcon: const Icon(Icons.email_outlined, color: Colors.grey),
@@ -229,9 +303,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ),
           ),
           const SizedBox(height: 16),
-
-          // Password
           TextField(
+            controller: _passwordController,
             obscureText: !_isPasswordVisible,
             decoration: InputDecoration(
               prefixIcon: const Icon(Icons.lock_outline, color: Colors.grey),
@@ -257,8 +330,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ),
           ),
           const SizedBox(height: 32),
-
-          // Next Button
           ElevatedButton(
             onPressed: _nextPage,
             style: ElevatedButton.styleFrom(
@@ -296,8 +367,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ),
           ),
           const SizedBox(height: 24),
-
-          // Profile Picture Picker
           Center(
             child: GestureDetector(
               onTap: _pickImage,
@@ -332,9 +401,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ),
           ),
           const SizedBox(height: 24),
-
-          // Phone
           TextField(
+            controller: _phoneController,
             keyboardType: TextInputType.phone,
             decoration: InputDecoration(
               prefixIcon: const Icon(Icons.phone_android, color: Colors.grey),
@@ -349,9 +417,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ),
           ),
           const SizedBox(height: 16),
-
-          // Location
           TextField(
+            controller: _locationController,
             decoration: InputDecoration(
               prefixIcon: const Icon(
                 Icons.location_on_outlined,
@@ -368,8 +435,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ),
           ),
           const SizedBox(height: 32),
-
-          // Buttons Row
           Row(
             children: [
               Expanded(
@@ -395,9 +460,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               const SizedBox(width: 16),
               Expanded(
                 child: ElevatedButton(
-                  onPressed: () {
-                    // TODO: Implement Register logic
-                  },
+                  onPressed: _isLoading ? null : _handleRegister,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
                     padding: const EdgeInsets.symmetric(vertical: 16),
@@ -405,14 +468,25 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                  child: const Text(
-                    'Register',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
+                  child: _isLoading
+                      ? const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              Colors.white,
+                            ),
+                          ),
+                        )
+                      : const Text(
+                          'Register',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
                 ),
               ),
             ],

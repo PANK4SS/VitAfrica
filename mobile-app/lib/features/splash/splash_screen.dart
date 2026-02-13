@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../core/theme/colors.dart';
+import '../../core/api/token_storage.dart';
 import '../auth/presentation/login_screen.dart';
+import '../main/main_shell.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -60,11 +62,17 @@ class _SplashScreenState extends State<SplashScreen>
 
     _controller.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
-        Future.delayed(const Duration(seconds: 2), () {
+        Future.delayed(const Duration(seconds: 2), () async {
           if (mounted) {
-            Navigator.of(context).pushReplacement(
-              MaterialPageRoute(builder: (context) => const LoginScreen()),
-            );
+            final hasToken = await TokenStorage.hasToken();
+            if (mounted) {
+              Navigator.of(context).pushReplacement(
+                MaterialPageRoute(
+                  builder: (context) =>
+                      hasToken ? const MainShell() : const LoginScreen(),
+                ),
+              );
+            }
           }
         });
       }

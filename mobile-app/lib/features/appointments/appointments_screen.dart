@@ -1,57 +1,47 @@
 import 'package:flutter/material.dart';
 import '../../core/theme/colors.dart';
+import '../../core/services/patient_service.dart';
+import '../../core/models/appointment_response.dart';
 
-class AppointmentsScreen extends StatelessWidget {
+class AppointmentsScreen extends StatefulWidget {
   const AppointmentsScreen({super.key});
 
-  // Mock data matching AppointmentResponse(id, date, hour, status, doctorName, doctorDepartment)
-  List<Map<String, dynamic>> get _mockAppointments => [
-    {
-      'id': 1,
-      'date': '2026-02-15',
-      'hour': '09:30',
-      'status': 'CONFIRMED',
-      'doctorName': 'Dr. Jean Mukendi',
-      'doctorDepartment': 'Cardiologie',
-    },
-    {
-      'id': 2,
-      'date': '2026-02-10',
-      'hour': '14:00',
-      'status': 'COMPLETED',
-      'doctorName': 'Dr. Marie Kabila',
-      'doctorDepartment': 'Dermatologie',
-    },
-    {
-      'id': 3,
-      'date': '2026-01-28',
-      'hour': '11:00',
-      'status': 'COMPLETED',
-      'doctorName': 'Dr. Paul Tshisekedi',
-      'doctorDepartment': 'Médecine Générale',
-    },
-    {
-      'id': 4,
-      'date': '2026-01-15',
-      'hour': '08:30',
-      'status': 'CONFIRMED',
-      'doctorName': 'Dr. Sarah Lumumba',
-      'doctorDepartment': 'Pédiatrie',
-    },
-    {
-      'id': 5,
-      'date': '2025-12-20',
-      'hour': '16:00',
-      'status': 'COMPLETED',
-      'doctorName': 'Dr. Jean Mukendi',
-      'doctorDepartment': 'Cardiologie',
-    },
-  ];
+  @override
+  State<AppointmentsScreen> createState() => _AppointmentsScreenState();
+}
+
+class _AppointmentsScreenState extends State<AppointmentsScreen> {
+  List<AppointmentResponse>? _appointments;
+  bool _isLoading = true;
+  String? _error;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadData();
+  }
+
+  Future<void> _loadData() async {
+    try {
+      final data = await PatientService.getAppointments();
+      if (mounted) {
+        setState(() {
+          _appointments = data;
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _error = e.toString().replaceFirst('Exception: ', '');
+          _isLoading = false;
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    final appointments = _mockAppointments;
-
     return Scaffold(
       backgroundColor: Colors.grey[50],
       body: SafeArea(
@@ -74,7 +64,9 @@ class AppointmentsScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    '${appointments.length} appointments',
+                    _isLoading
+                        ? 'Loading...'
+                        : '${_appointments?.length ?? 0} appointments',
                     style: TextStyle(fontSize: 14, color: Colors.grey[500]),
                   ),
                 ],
@@ -82,17 +74,30 @@ class AppointmentsScreen extends StatelessWidget {
             ),
             const SizedBox(height: 20),
 
-            // List
+            // Content
             Expanded(
-              child: ListView.separated(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                itemCount: appointments.length,
-                separatorBuilder: (_, __) => const SizedBox(height: 12),
-                itemBuilder: (context, index) {
-                  final appt = appointments[index];
-                  return _buildAppointmentCard(appt);
-                },
-              ),
+              child: _isLoading
+                  ? const Center(
+                      child: CircularProgressIndicator(
+                        color: AppColors.primary,
+                      ),
+                    )
+                  : _error != null
+                  ? _buildErrorState()
+                  : _appointments!.isEmpty
+                  ? _buildEmptyState()
+                  : RefreshIndicator(
+                      color: AppColors.primary,
+                      onRefresh: _loadData,
+                      child: ListView.separated(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        itemCount: _appointments!.length,
+                        separatorBuilder: (_, __) => const SizedBox(height: 12),
+                        itemBuilder: (context, index) {
+                          return _buildAppointmentCard(_appointments![index]);
+                        },
+                      ),
+                    ),
             ),
           ],
         ),
@@ -100,8 +105,60 @@ class AppointmentsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildAppointmentCard(Map<String, dynamic> appt) {
-    final isConfirmed = appt['status'] == 'CONFIRMED';
+  Widget _buildErrorState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.cloud_off, size: 48, color: Colors.grey[400]),
+          const SizedBox(height: 12),
+          Text(_error!, style: TextStyle(color: Colors.grey[600])),
+          const SizedBox(height: 16),
+          ElevatedButton.icon(
+            onPressed: () {
+              setState(() {
+                _isLoading = true;
+                _error = null;
+              });
+              _loadData();
+            },
+            icon: const Icon(Icons.refresh, size: 18),
+            label: const Text('Retry'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.calendar_today, size: 48, color: Colors.grey[400]),
+          const SizedBox(height: 12),
+          Text(
+            'No appointments yet',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: Colors.grey[600],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAppointmentCard(AppointmentResponse appt) {
+    final isConfirmed = appt.status == 'CONFIRMED';
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -131,7 +188,9 @@ class AppointmentsScreen extends StatelessWidget {
             child: Column(
               children: [
                 Text(
-                  appt['date'].toString().split('-')[2],
+                  appt.date.split('-').length >= 3
+                      ? appt.date.split('-')[2]
+                      : appt.date,
                   style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
@@ -139,7 +198,9 @@ class AppointmentsScreen extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  _monthName(appt['date'].toString().split('-')[1]),
+                  appt.date.split('-').length >= 2
+                      ? _monthName(appt.date.split('-')[1])
+                      : '',
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
@@ -157,7 +218,7 @@ class AppointmentsScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  appt['doctorName'],
+                  appt.doctorName ?? 'Doctor',
                   style: const TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w600,
@@ -166,7 +227,7 @@ class AppointmentsScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  appt['doctorDepartment'],
+                  appt.doctorDepartment ?? '',
                   style: TextStyle(fontSize: 13, color: Colors.grey[600]),
                 ),
                 const SizedBox(height: 8),
@@ -175,7 +236,7 @@ class AppointmentsScreen extends StatelessWidget {
                     Icon(Icons.access_time, size: 14, color: Colors.grey[500]),
                     const SizedBox(width: 4),
                     Text(
-                      appt['hour'],
+                      appt.hour,
                       style: TextStyle(
                         fontSize: 13,
                         color: Colors.grey[600],
@@ -198,7 +259,7 @@ class AppointmentsScreen extends StatelessWidget {
               borderRadius: BorderRadius.circular(20),
             ),
             child: Text(
-              appt['status'],
+              appt.status,
               style: TextStyle(
                 fontSize: 11,
                 fontWeight: FontWeight.bold,

@@ -1,19 +1,110 @@
 import 'package:flutter/material.dart';
 import '../../core/theme/colors.dart';
+import '../../core/services/patient_service.dart';
+import '../../core/services/auth_service.dart';
+import '../../core/models/profile_response.dart';
 import '../auth/presentation/login_screen.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
 
   @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  ProfileResponse? _profile;
+  bool _isLoading = true;
+  String? _error;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadData();
+  }
+
+  Future<void> _loadData() async {
+    try {
+      final data = await PatientService.getProfile();
+      if (mounted) {
+        setState(() {
+          _profile = data;
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _error = e.toString().replaceFirst('Exception: ', '');
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _handleLogout() async {
+    await AuthService.logout();
+    if (mounted) {
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (context) => const LoginScreen()),
+        (route) => false,
+      );
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    if (_isLoading) {
+      return const Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(color: AppColors.primary),
+        ),
+      );
+    }
+
+    if (_error != null) {
+      return Scaffold(
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.cloud_off, size: 48, color: Colors.grey[400]),
+              const SizedBox(height: 12),
+              Text(_error!, style: TextStyle(color: Colors.grey[600])),
+              const SizedBox(height: 16),
+              ElevatedButton.icon(
+                onPressed: () {
+                  setState(() {
+                    _isLoading = true;
+                    _error = null;
+                  });
+                  _loadData();
+                },
+                icon: const Icon(Icons.refresh, size: 18),
+                label: const Text('Retry'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    final profile = _profile!;
+
     return Scaffold(
       backgroundColor: Colors.grey[50],
       body: SingleChildScrollView(
         child: Column(
           children: [
             // ===== PROFILE HEADER =====
-            _buildProfileHeader(),
+            _buildProfileHeader(profile),
             const SizedBox(height: 24),
 
             // ===== INFO TILES =====
@@ -24,25 +115,25 @@ class ProfileScreen extends StatelessWidget {
                   _buildInfoTile(
                     icon: Icons.person_outline,
                     label: 'Full Name',
-                    value: 'Rayane Bicaba',
+                    value: profile.name ?? 'N/A',
                   ),
                   const SizedBox(height: 12),
                   _buildInfoTile(
                     icon: Icons.email_outlined,
                     label: 'Email',
-                    value: 'rayane@vitafrica.com',
+                    value: profile.email ?? 'N/A',
                   ),
                   const SizedBox(height: 12),
                   _buildInfoTile(
                     icon: Icons.phone_android,
                     label: 'Phone',
-                    value: '+226 70 00 00 00',
+                    value: profile.phone ?? 'N/A',
                   ),
                   const SizedBox(height: 12),
                   _buildInfoTile(
                     icon: Icons.location_on_outlined,
                     label: 'Address',
-                    value: 'Ouagadougou, Burkina Faso',
+                    value: profile.locationAddress ?? 'N/A',
                   ),
                 ],
               ),
@@ -56,14 +147,7 @@ class ProfileScreen extends StatelessWidget {
               child: SizedBox(
                 width: double.infinity,
                 child: OutlinedButton.icon(
-                  onPressed: () {
-                    Navigator.of(context).pushAndRemoveUntil(
-                      MaterialPageRoute(
-                        builder: (context) => const LoginScreen(),
-                      ),
-                      (route) => false,
-                    );
-                  },
+                  onPressed: _handleLogout,
                   icon: const Icon(Icons.logout, size: 20),
                   label: const Text(
                     'Logout',
@@ -87,7 +171,7 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildProfileHeader() {
+  Widget _buildProfileHeader(ProfileResponse profile) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.only(top: 60, bottom: 30),
@@ -104,23 +188,26 @@ class ProfileScreen extends StatelessWidget {
       ),
       child: Column(
         children: [
-          // Profile Picture
           Container(
             width: 100,
             height: 100,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               border: Border.all(color: AppColors.secondary, width: 3),
-              image: const DecorationImage(
-                image: AssetImage('assets/images/Profile.png'),
+              image: DecorationImage(
+                image:
+                    profile.profilePicUrl != null &&
+                        profile.profilePicUrl!.isNotEmpty
+                    ? NetworkImage(profile.profilePicUrl!) as ImageProvider
+                    : const AssetImage('assets/images/Profile.png'),
                 fit: BoxFit.cover,
               ),
             ),
           ),
           const SizedBox(height: 16),
-          const Text(
-            'Rayane Bicaba',
-            style: TextStyle(
+          Text(
+            profile.name ?? 'Patient',
+            style: const TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.bold,
               color: Colors.white,
@@ -128,7 +215,7 @@ class ProfileScreen extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           Text(
-            'rayane@vitafrica.com',
+            profile.email ?? '',
             style: TextStyle(
               fontSize: 14,
               color: Colors.white.withOpacity(0.7),

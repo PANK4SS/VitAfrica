@@ -1,85 +1,53 @@
 import 'package:flutter/material.dart';
 import '../../core/theme/colors.dart';
+import '../../core/services/patient_service.dart';
+import '../../core/models/prescription_response.dart';
 
-class PrescriptionsScreen extends StatelessWidget {
+class PrescriptionsScreen extends StatefulWidget {
   const PrescriptionsScreen({super.key});
 
-  // Mock data matching PrescriptionResponse(id, date, doctorName, doctorDepartment, drugs[])
-  // with DrugResponse(drugName, dosage, frequency, duration)
-  List<Map<String, dynamic>> get _mockPrescriptions => [
-    {
-      'id': 1,
-      'date': '10/02/2026',
-      'doctorName': 'Dr. Jean Mukendi',
-      'doctorDepartment': 'Cardiologie',
-      'drugs': [
-        {
-          'drugName': 'Amlodipine',
-          'dosage': '5mg',
-          'frequency': '1x/jour',
-          'duration': '30 jours',
-        },
-        {
-          'drugName': 'Aspirine',
-          'dosage': '100mg',
-          'frequency': '1x/jour',
-          'duration': '90 jours',
-        },
-      ],
-    },
-    {
-      'id': 2,
-      'date': '25/01/2026',
-      'doctorName': 'Dr. Marie Kabila',
-      'doctorDepartment': 'Dermatologie',
-      'drugs': [
-        {
-          'drugName': 'Crème Hydrocortisone',
-          'dosage': '1%',
-          'frequency': '2x/jour',
-          'duration': '14 jours',
-        },
-      ],
-    },
-    {
-      'id': 3,
-      'date': '15/12/2025',
-      'doctorName': 'Dr. Paul Tshisekedi',
-      'doctorDepartment': 'Médecine Générale',
-      'drugs': [
-        {
-          'drugName': 'Paracétamol',
-          'dosage': '500mg',
-          'frequency': '3x/jour',
-          'duration': '5 jours',
-        },
-        {
-          'drugName': 'Amoxicilline',
-          'dosage': '1g',
-          'frequency': '2x/jour',
-          'duration': '7 jours',
-        },
-        {
-          'drugName': 'Ibuprofène',
-          'dosage': '400mg',
-          'frequency': '2x/jour',
-          'duration': '5 jours',
-        },
-      ],
-    },
-  ];
+  @override
+  State<PrescriptionsScreen> createState() => _PrescriptionsScreenState();
+}
+
+class _PrescriptionsScreenState extends State<PrescriptionsScreen> {
+  List<PrescriptionResponse>? _prescriptions;
+  bool _isLoading = true;
+  String? _error;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadData();
+  }
+
+  Future<void> _loadData() async {
+    try {
+      final data = await PatientService.getPrescriptions();
+      if (mounted) {
+        setState(() {
+          _prescriptions = data;
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _error = e.toString().replaceFirst('Exception: ', '');
+          _isLoading = false;
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    final prescriptions = _mockPrescriptions;
-
     return Scaffold(
       backgroundColor: Colors.grey[50],
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
               child: Column(
@@ -95,35 +63,102 @@ class PrescriptionsScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    '${prescriptions.length} prescriptions',
+                    _isLoading
+                        ? 'Loading...'
+                        : '${_prescriptions?.length ?? 0} prescriptions',
                     style: TextStyle(fontSize: 14, color: Colors.grey[500]),
                   ),
                 ],
               ),
             ),
             const SizedBox(height: 20),
-
-            // List
             Expanded(
-              child: ListView.separated(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                itemCount: prescriptions.length,
-                separatorBuilder: (_, __) => const SizedBox(height: 12),
-                itemBuilder: (context, index) {
-                  final rx = prescriptions[index];
-                  return _PrescriptionCard(prescription: rx);
-                },
-              ),
+              child: _isLoading
+                  ? const Center(
+                      child: CircularProgressIndicator(
+                        color: AppColors.primary,
+                      ),
+                    )
+                  : _error != null
+                  ? _buildErrorState()
+                  : _prescriptions!.isEmpty
+                  ? _buildEmptyState()
+                  : RefreshIndicator(
+                      color: AppColors.primary,
+                      onRefresh: _loadData,
+                      child: ListView.separated(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        itemCount: _prescriptions!.length,
+                        separatorBuilder: (_, __) => const SizedBox(height: 12),
+                        itemBuilder: (context, index) {
+                          return _PrescriptionCard(
+                            prescription: _prescriptions![index],
+                          );
+                        },
+                      ),
+                    ),
             ),
           ],
         ),
       ),
     );
   }
+
+  Widget _buildErrorState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.cloud_off, size: 48, color: Colors.grey[400]),
+          const SizedBox(height: 12),
+          Text(_error!, style: TextStyle(color: Colors.grey[600])),
+          const SizedBox(height: 16),
+          ElevatedButton.icon(
+            onPressed: () {
+              setState(() {
+                _isLoading = true;
+                _error = null;
+              });
+              _loadData();
+            },
+            icon: const Icon(Icons.refresh, size: 18),
+            label: const Text('Retry'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.medication_outlined, size: 48, color: Colors.grey[400]),
+          const SizedBox(height: 12),
+          Text(
+            'No prescriptions yet',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: Colors.grey[600],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 class _PrescriptionCard extends StatefulWidget {
-  final Map<String, dynamic> prescription;
+  final PrescriptionResponse prescription;
 
   const _PrescriptionCard({required this.prescription});
 
@@ -131,14 +166,12 @@ class _PrescriptionCard extends StatefulWidget {
   State<_PrescriptionCard> createState() => _PrescriptionCardState();
 }
 
-class _PrescriptionCardState extends State<_PrescriptionCard>
-    with SingleTickerProviderStateMixin {
+class _PrescriptionCardState extends State<_PrescriptionCard> {
   bool _isExpanded = false;
 
   @override
   Widget build(BuildContext context) {
     final rx = widget.prescription;
-    final drugs = rx['drugs'] as List<Map<String, dynamic>>;
 
     return AnimatedContainer(
       duration: const Duration(milliseconds: 300),
@@ -156,7 +189,6 @@ class _PrescriptionCardState extends State<_PrescriptionCard>
       ),
       child: Column(
         children: [
-          // Header (tappable)
           InkWell(
             onTap: () => setState(() => _isExpanded = !_isExpanded),
             borderRadius: BorderRadius.circular(16),
@@ -164,7 +196,6 @@ class _PrescriptionCardState extends State<_PrescriptionCard>
               padding: const EdgeInsets.all(16),
               child: Row(
                 children: [
-                  // Prescription icon
                   Container(
                     width: 48,
                     height: 48,
@@ -184,7 +215,7 @@ class _PrescriptionCardState extends State<_PrescriptionCard>
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          rx['doctorName'],
+                          rx.doctorName,
                           style: const TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w600,
@@ -193,7 +224,7 @@ class _PrescriptionCardState extends State<_PrescriptionCard>
                         ),
                         const SizedBox(height: 2),
                         Text(
-                          rx['doctorDepartment'],
+                          rx.doctorDepartment,
                           style: TextStyle(
                             fontSize: 13,
                             color: Colors.grey[600],
@@ -209,7 +240,7 @@ class _PrescriptionCardState extends State<_PrescriptionCard>
                             ),
                             const SizedBox(width: 4),
                             Text(
-                              rx['date'],
+                              rx.date,
                               style: TextStyle(
                                 fontSize: 12,
                                 color: Colors.grey[500],
@@ -226,7 +257,7 @@ class _PrescriptionCardState extends State<_PrescriptionCard>
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               child: Text(
-                                '${drugs.length} médicament${drugs.length > 1 ? 's' : ''}',
+                                '${rx.drugs.length} médicament${rx.drugs.length > 1 ? 's' : ''}',
                                 style: const TextStyle(
                                   fontSize: 11,
                                   fontWeight: FontWeight.w600,
@@ -251,8 +282,6 @@ class _PrescriptionCardState extends State<_PrescriptionCard>
               ),
             ),
           ),
-
-          // Expandable drug list
           AnimatedCrossFade(
             firstChild: const SizedBox.shrink(),
             secondChild: Column(
@@ -261,7 +290,9 @@ class _PrescriptionCardState extends State<_PrescriptionCard>
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
                   child: Column(
-                    children: drugs.map((drug) => _buildDrugRow(drug)).toList(),
+                    children: rx.drugs
+                        .map((drug) => _buildDrugRow(drug))
+                        .toList(),
                   ),
                 ),
               ],
@@ -276,7 +307,7 @@ class _PrescriptionCardState extends State<_PrescriptionCard>
     );
   }
 
-  Widget _buildDrugRow(Map<String, dynamic> drug) {
+  Widget _buildDrugRow(DrugResponse drug) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
       child: Row(
@@ -296,7 +327,7 @@ class _PrescriptionCardState extends State<_PrescriptionCard>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  drug['drugName'],
+                  drug.drugName,
                   style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
@@ -305,7 +336,7 @@ class _PrescriptionCardState extends State<_PrescriptionCard>
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  '${drug['dosage']} · ${drug['frequency']} · ${drug['duration']}',
+                  '${drug.dosage} · ${drug.frequency} · ${drug.duration}',
                   style: TextStyle(fontSize: 12, color: Colors.grey[600]),
                 ),
               ],
