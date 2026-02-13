@@ -44,7 +44,11 @@ public class SecurityConfig {
                         // Public Mobile Endpoints
                         .requestMatchers("/api/patients/mobile/register").permitAll()
                         .requestMatchers("/api/patients/mobile/login").permitAll()
+                        .requestMatchers("/api/patients/mobile/upload-profile-pic").permitAll() // Upload profile picture (for registration)
                         .requestMatchers("/api/patients/mobile/home").permitAll() // Home est publique pour l'instant ? Si tu veux, retire ça.
+                        
+                        // Public file serving
+                        .requestMatchers("/api/files/**").permitAll()
 
                         // Swagger (Public)
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
