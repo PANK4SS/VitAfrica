@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import '../../core/theme/colors.dart';
 import '../../core/services/patient_service.dart';
@@ -171,7 +172,33 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
+  /// Helper function to get the correct ImageProvider (FileImage for local paths, NetworkImage for URLs)
+  ImageProvider? _getImageProvider(String? imagePath) {
+    if (imagePath == null || imagePath.isEmpty) return null;
+    
+    // Check if it's a local file path (starts with / or file://)
+    if (imagePath.startsWith('/') || imagePath.startsWith('file://')) {
+      // Remove file:// prefix if present
+      final cleanPath = imagePath.replaceFirst('file://', '');
+      final file = File(cleanPath);
+      if (file.existsSync()) {
+        return FileImage(file);
+      }
+      return null;
+    }
+    
+    // Check if it's an HTTP/HTTPS URL
+    if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+      return NetworkImage(imagePath);
+    }
+    
+    // If it doesn't match any pattern, return null
+    return null;
+  }
+
   Widget _buildProfileHeader(ProfileResponse profile) {
+    final imageProvider = _getImageProvider(profile.profilePicUrl);
+    
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.only(top: 60, bottom: 30),
@@ -195,17 +222,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
               shape: BoxShape.circle,
               border: Border.all(color: AppColors.secondary, width: 3),
               color: Colors.white.withOpacity(0.2),
-              image:
-                  profile.profilePicUrl != null &&
-                      profile.profilePicUrl!.isNotEmpty
+              image: imageProvider != null
                   ? DecorationImage(
-                      image: NetworkImage(profile.profilePicUrl!),
+                      image: imageProvider,
                       fit: BoxFit.cover,
                     )
                   : null,
             ),
-            child:
-                profile.profilePicUrl == null || profile.profilePicUrl!.isEmpty
+            child: imageProvider == null
                 ? const Icon(Icons.person, size: 50, color: Colors.white70)
                 : null,
           ),
