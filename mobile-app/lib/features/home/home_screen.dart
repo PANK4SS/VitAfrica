@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import '../../core/theme/colors.dart';
 import '../../core/services/patient_service.dart';
@@ -145,7 +146,33 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  /// Helper function to get the correct ImageProvider (FileImage for local paths, NetworkImage for URLs)
+  ImageProvider? _getImageProvider(String? imagePath) {
+    if (imagePath == null || imagePath.isEmpty) return null;
+    
+    // Check if it's a local file path (starts with / or file://)
+    if (imagePath.startsWith('/') || imagePath.startsWith('file://')) {
+      // Remove file:// prefix if present
+      final cleanPath = imagePath.replaceFirst('file://', '');
+      final file = File(cleanPath);
+      if (file.existsSync()) {
+        return FileImage(file);
+      }
+      return null;
+    }
+    
+    // Check if it's an HTTP/HTTPS URL
+    if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+      return NetworkImage(imagePath);
+    }
+    
+    // If it doesn't match any pattern, return null
+    return null;
+  }
+
   Widget _buildHeader(HomeResponse data) {
+    final imageProvider = _getImageProvider(data.profilePic);
+    
     return Row(
       children: [
         Container(
@@ -155,14 +182,14 @@ class _HomeScreenState extends State<HomeScreen> {
             shape: BoxShape.circle,
             border: Border.all(color: AppColors.secondary, width: 2.5),
             color: Colors.grey[200],
-            image: data.profilePic != null && data.profilePic!.isNotEmpty
+            image: imageProvider != null
                 ? DecorationImage(
-                    image: NetworkImage(data.profilePic!),
+                    image: imageProvider,
                     fit: BoxFit.cover,
                   )
                 : null,
           ),
-          child: data.profilePic == null || data.profilePic!.isEmpty
+          child: imageProvider == null
               ? Icon(Icons.person, size: 28, color: Colors.grey[400])
               : null,
         ),
