@@ -40,3 +40,6 @@ mysql_data/
 
 # Build artifacts
 */target/
+
+# Uploaded files
+uploads/
