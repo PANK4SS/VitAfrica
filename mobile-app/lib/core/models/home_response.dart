@@ -1,7 +1,7 @@
 class HomeResponse {
   // Profile
-  final String? clientName;
-  final String? profilePicUrl;
+  final String? userName;
+  final String? profilePic;
   // Appointment
   final String? date;
   final String? hour;
@@ -16,8 +16,8 @@ class HomeResponse {
   final String? dateMeasured;
 
   HomeResponse({
-    this.clientName,
-    this.profilePicUrl,
+    this.userName,
+    this.profilePic,
     this.date,
     this.hour,
     this.appointmentStatus,
@@ -32,8 +32,9 @@ class HomeResponse {
 
   factory HomeResponse.fromJson(Map<String, dynamic> json) {
     return HomeResponse(
-      clientName: json['clientName'],
-      profilePicUrl: json['profilePicUrl'],
+      // Backend MobileHomeResponse uses: userName, profilePic
+      userName: json['userName'],
+      profilePic: json['profilePic'],
       date: json['date'],
       hour: json['hour'],
       appointmentStatus: json['appointmentStatus'],
