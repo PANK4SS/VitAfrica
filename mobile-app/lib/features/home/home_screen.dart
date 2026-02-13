@@ -155,14 +155,14 @@ class _HomeScreenState extends State<HomeScreen> {
             shape: BoxShape.circle,
             border: Border.all(color: AppColors.secondary, width: 2.5),
             color: Colors.grey[200],
-            image: data.profilePicUrl != null && data.profilePicUrl!.isNotEmpty
+            image: data.profilePic != null && data.profilePic!.isNotEmpty
                 ? DecorationImage(
-                    image: NetworkImage(data.profilePicUrl!),
+                    image: NetworkImage(data.profilePic!),
                     fit: BoxFit.cover,
                   )
                 : null,
           ),
-          child: data.profilePicUrl == null || data.profilePicUrl!.isEmpty
+          child: data.profilePic == null || data.profilePic!.isEmpty
               ? Icon(Icons.person, size: 28, color: Colors.grey[400])
               : null,
         ),
@@ -176,7 +176,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 style: TextStyle(fontSize: 14, color: Colors.grey[600]),
               ),
               Text(
-                data.clientName ?? 'Patient',
+                (data.userName == null || data.userName!.isEmpty)
+                    ? 'Patient'
+                    : data.userName!,
                 style: const TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
