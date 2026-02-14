@@ -21,9 +21,6 @@ public class Doctor {
     @Column(name = "doctor_id")
     private Long doctorId;
 
-//    @Column(nullable = false)
-//    private String name;
-
     @Column(nullable = false)
     private String department;
 
