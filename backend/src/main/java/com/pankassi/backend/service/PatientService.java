@@ -38,6 +38,7 @@ public class PatientService {
     private final VitalSignRepository vitalSignRepository;
 
     private final LabResultRepository labResultRepository;
+    private final DoctorRepository doctorRepository;
 
     //Patient Registration
     public ClientResponse registerPatient (RegisterPatientRequest registerPatientRequest,String roleName){
@@ -96,6 +97,8 @@ public class PatientService {
         Patient patient = patientRepository.findByClient(client)
                 .orElseThrow(() -> new IllegalArgumentException("Patient profile not found"));
 
+        Doctor doctor = doctorRepository.findByClient(client).orElseThrow(()-> new IllegalArgumentException("Doctor profile not found"));
+
         // ===== APPOINTMENT =====
         Optional<Appointment> appointmentOpt = appointmentRepository
                 .findFirstByPatientAndStatusOrderByDateTimeDesc(patient, "CONFIRMED");
@@ -112,8 +115,7 @@ public class PatientService {
             appointmentStatus = appointment.getStatus();
 
             if (appointment.getDoctor() != null) {
-                Doctor doctor = appointment.getDoctor();
-                doctorName       = doctor.getName();
+                doctorName       = doctor.getClient().getClientName();
                 doctorDepartment = doctor.getDepartment();
             }
         }
@@ -170,6 +172,9 @@ public class PatientService {
         Patient patient = patientRepository.findByClient(client)
                 .orElseThrow(() -> new IllegalArgumentException("Patient profile not found"));
 
+        Doctor doctor = doctorRepository.findByClient(client).orElseThrow(()-> new IllegalArgumentException("Doctor profile not found"));
+        String doctorName = doctor.getClient().getClientName();
+
         List<Appointment> appointments = appointmentRepository
                 .findByPatientAndStatusInOrderByDateTimeDesc(
                         patient,
@@ -184,7 +189,7 @@ public class PatientService {
                         appointment.getDateTime().toLocalTime()
                                 .format(DateTimeFormatter.ofPattern("HH:mm")),
                         appointment.getStatus(),
-                        appointment.getDoctor() != null ? appointment.getDoctor().getName() : null,
+                        appointment.getDoctor() != null ? doctorName: null,
                         appointment.getDoctor() != null ? appointment.getDoctor().getDepartment() : null
                 ))
                 .toList();
@@ -204,6 +209,8 @@ public class PatientService {
         Patient patient = patientRepository.findByClient(client)
                 .orElseThrow(() -> new IllegalArgumentException("Patient profile not found"));
 
+        Doctor doctor = doctorRepository.findByClient(client).orElseThrow(()-> new IllegalArgumentException("Doctor profile not found"));
+        String doctorName = doctor.getClient().getClientName();
         return prescriptionRepository
                 .findByPatientOrderByPrescriptionDateDesc(patient)
                 .stream()
@@ -211,7 +218,7 @@ public class PatientService {
                         prescription.getPrescriptionId(),
                         prescription.getPrescriptionDate()
                                 .format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),
-                        prescription.getDoctor().getName(),
+                        doctorName,
                         prescription.getDoctor().getDepartment(),
                         prescription.getDrugs().stream()
                                 .map(drug -> new DrugResponse(
