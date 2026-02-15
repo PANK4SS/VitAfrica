@@ -1,5 +1,6 @@
 package com.pankassi.backend.domain.repository;
 
+import com.pankassi.backend.domain.model.Doctor;
 import com.pankassi.backend.domain.model.MedicalPrescription;
 import com.pankassi.backend.domain.model.Patient;
 import org.springframework.data.jpa.repository.JpaRepository;
