@@ -20,8 +20,9 @@ public class UserProfile {
     @Column(name= "profile_pic_url", nullable = false)
     private String profilePicUrl;
 
-    @Column(name="status",unique = true)
-    private String status;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private RequestStatus status = RequestStatus.PENDING;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "clientId", unique = true, nullable = false)
