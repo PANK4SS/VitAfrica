@@ -43,3 +43,5 @@ mysql_data/
 
 # Uploaded files
 uploads/
+
+docker-compose.yml.txt 
