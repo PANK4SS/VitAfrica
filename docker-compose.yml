@@ -36,10 +36,14 @@ services:
       SPRING_DATASOURCE_USERNAME: auth_user
       SPRING_DATASOURCE_PASSWORD: auth_user_2026
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
-      JWT_SECRET: ${JWT_SECRET}
-      # ✅ DEV — AccessCore ouvert, tout est permis
-      SPRING_PROFILES_ACTIVE: dev
+      JWT_SECRET: local_dev_jwt_secret_key_minimum_32_chars
       APP_SECURITY_DEV_MODE: "true"
+      SPRING_PROFILES_ACTIVE: dev
+      # ✅ Admin par défaut local
+      APP_ADMIN_EMAIL: rayanebicaba.dev@gmail.com
+      APP_ADMIN_PASSWORD: rayanebicaba.dev@gmail.com
+      APP_ADMIN_NAME: Rayane BICABA
+      APP_BASE_URL: http://192.168.100.202:8080
     depends_on:
       mysql:
         condition: service_healthy
@@ -52,3 +56,61 @@ volumes:
 networks:
   vitafrica_network:
     driver: bridge
+
+
+
+
+# services:
+
+#   mysql:
+#     image: mysql:8.0
+#     container_name: vitafrica_mysql
+#     restart: unless-stopped
+#     environment:
+#       MYSQL_ROOT_PASSWORD: root
+#       MYSQL_DATABASE: vitafrica_db
+#       MYSQL_USER: auth_user
+#       MYSQL_PASSWORD: auth_user_2026
+#     ports:
+#       - "3307:3306"
+#     volumes:
+#       - mysql_data:/var/lib/mysql
+#     networks:
+#       - vitafrica_network
+#     healthcheck:
+#       test: ["CMD", "mysqladmin", "ping", "-u", "root", "-proot", "-h", "localhost"]
+#       interval: 5s
+#       timeout: 5s
+#       retries: 20
+#       start_period: 30s
+
+#   backend:
+#     build:
+#       context: .
+#       dockerfile: backend/Dockerfile
+#     container_name: vitafrica_backend
+#     restart: on-failure
+#     ports:
+#       - "8080:8080"
+#     environment:
+#       SERVER_PORT: 8080
+#       SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/vitafrica_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+#       SPRING_DATASOURCE_USERNAME: auth_user
+#       SPRING_DATASOURCE_PASSWORD: auth_user_2026
+#       SPRING_JPA_HIBERNATE_DDL_AUTO: update
+#       JWT_SECRET: ${JWT_SECRET}
+#       # ✅ DEV — AccessCore ouvert, tout est permis
+#       SPRING_PROFILES_ACTIVE: dev
+#       APP_SECURITY_DEV_MODE: "true"
+#     depends_on:
+#       mysql:
+#         condition: service_healthy
+#     networks:
+#       - vitafrica_network
+
+# volumes:
+#   mysql_data:
+
+# networks:
+#   vitafrica_network:
+#     driver: bridge
