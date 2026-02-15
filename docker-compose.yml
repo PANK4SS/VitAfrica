@@ -10,7 +10,7 @@ services:
       MYSQL_USER: auth_user
       MYSQL_PASSWORD: auth_user_2026
     ports:
-      - "3307:3306"       # ← 3307 pour éviter le conflit avec MySQL local
+      - "3307:3306"
     volumes:
       - mysql_data:/var/lib/mysql
     networks:
@@ -19,15 +19,15 @@ services:
       test: ["CMD", "mysqladmin", "ping", "-u", "root", "-proot", "-h", "localhost"]
       interval: 5s
       timeout: 5s
-      retries: 20          # ← plus de tentatives
-      start_period: 30s    # ← attendre 30s avant de commencer les checks
+      retries: 20
+      start_period: 30s
 
   backend:
     build:
       context: .
       dockerfile: backend/Dockerfile
     container_name: vitafrica_backend
-    restart: on-failure    # ← redémarre seulement en cas d'erreur, pas en boucle infinie
+    restart: on-failure
     ports:
       - "8080:8080"
     environment:
@@ -37,9 +37,12 @@ services:
       SPRING_DATASOURCE_PASSWORD: auth_user_2026
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
       JWT_SECRET: ${JWT_SECRET}
+      # ✅ DEV — AccessCore ouvert, tout est permis
+      SPRING_PROFILES_ACTIVE: dev
+      APP_SECURITY_DEV_MODE: "true"
     depends_on:
       mysql:
-        condition: service_healthy   # ← attend que MySQL soit healthy
+        condition: service_healthy
     networks:
       - vitafrica_network
 
