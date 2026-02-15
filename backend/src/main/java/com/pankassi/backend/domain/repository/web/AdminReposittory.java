@@ -1,4 +1,7 @@
 package com.pankassi.backend.domain.repository.web;
 
-public interface AdminReposittory {
+import com.pankassi.backend.domain.model.Admin;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface AdminReposittory extends JpaRepository<Admin,Long> {
 }
