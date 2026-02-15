@@ -10,4 +10,7 @@ import java.util.List;
 @Repository
 public interface MedicalPrescriptionRepository extends JpaRepository<MedicalPrescription,Long> {
     List<MedicalPrescription> findByPatientOrderByPrescriptionDateDesc(Patient patient);
+
+    //DOCTOR
+    List<MedicalPrescription> findByDoctorOrderByPrescriptionDateDesc(Doctor doctor);
 }

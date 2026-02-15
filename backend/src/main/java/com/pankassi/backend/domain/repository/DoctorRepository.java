@@ -4,6 +4,7 @@ import com.pankassi.accesscore.domain.model.Client;
 import com.pankassi.backend.domain.model.Doctor;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface DoctorRepository extends JpaRepository<Doctor,Long> {
@@ -12,4 +13,7 @@ public interface DoctorRepository extends JpaRepository<Doctor,Long> {
 
 
     long countByDepartment(String department);
+
+    // STAFF — for the select doctor during the appointment creation
+    List<Doctor> findAllByOrderByDepartmentAsc();
 }

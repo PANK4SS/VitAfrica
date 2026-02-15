@@ -1,6 +1,7 @@
 package com.pankassi.backend.domain.repository;
 
 import com.pankassi.backend.domain.model.Appointment;
+import com.pankassi.backend.domain.model.Doctor;
 import com.pankassi.backend.domain.model.Patient;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -14,4 +15,12 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
     Optional<Appointment> findFirstByPatientAndStatusOrderByDateTimeDesc(Patient patient, String status);
 
     List<Appointment> findByPatientAndStatusInOrderByDateTimeDesc(Patient patient, List<String> statuses);
+
+    // DOCTOR
+    List<Appointment> findByDoctorOrderByDateTimeDesc(Doctor doctor);
+    List<Appointment> findByDoctorAndStatusOrderByDateTimeDesc(Doctor doctor, String status);
+    long countByDoctorAndStatus(Doctor doctor, String status);
+
+    //STAFF
+    List<Appointment> findByPatientOrderByDateTimeDesc(Patient patient);
 }

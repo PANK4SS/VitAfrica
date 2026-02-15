@@ -83,4 +83,38 @@ public class FileUploadService {
             return false;
         }
     }
+
+
+    // Ajoute cette méthode dans FileUploadService.java
+    public String uploadLabResult(MultipartFile file) throws IOException {
+        if (file.isEmpty()) {
+            throw new IllegalArgumentException("File is empty");
+        }
+
+        // Accepte PDF et images
+        String contentType = file.getContentType();
+        if (contentType == null ||
+                (!contentType.equals("application/pdf") && !contentType.startsWith("image/"))) {
+            throw new IllegalArgumentException("File must be a PDF or an image");
+        }
+
+        Path uploadPath = Paths.get(uploadDir, "lab-results");
+        if (!Files.exists(uploadPath)) {
+            Files.createDirectories(uploadPath);
+        }
+
+        String originalFilename = file.getOriginalFilename();
+        String extension = "";
+        if (originalFilename != null && originalFilename.contains(".")) {
+            extension = originalFilename.substring(originalFilename.lastIndexOf("."));
+        }
+        String uniqueFilename = UUID.randomUUID().toString() + extension;
+
+        Path filePath = uploadPath.resolve(uniqueFilename);
+        Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
+        log.info("Lab result uploaded: {}", filePath);
+
+        return baseUrl + "/api/files/lab-results/" + uniqueFilename;
+    }
 }
