@@ -1,0 +1,54 @@
+services:
+
+  mysql:
+    image: mysql:8.0
+    container_name: vitafrica_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}       # ✅ plus de mot de passe en clair
+      MYSQL_DATABASE: vitafrica_db
+      MYSQL_USER: auth_user
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - vitafrica_network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}", "-h", "localhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 30s
+
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: vitafrica_backend
+    restart: unless-stopped                             # ✅ toujours redémarrer en prod
+    ports:
+      - "8080:8080"
+    environment:
+      SERVER_PORT: 8080
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/vitafrica_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: auth_user
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD}
+      SPRING_JPA_HIBERNATE_DDL_AUTO: validate                # ✅ validate en prod, jamais update
+      JWT_SECRET: ${JWT_SECRET}
+      # ✅ PROD — AccessCore verrouillé, DEV_ADMIN requis
+      SPRING_PROFILES_ACTIVE: prod
+      APP_SECURITY_DEV_MODE: "false"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - vitafrica_network
+
+volumes:
+  mysql_data:
+
+networks:
+  vitafrica_network:
+    driver: bridge
