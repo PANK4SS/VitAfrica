@@ -30,4 +30,14 @@ public class ApiExceptionHandler {
                 "message", ex.getMessage()
         ));
     }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<Map<String, Object>> handleGeneric(Exception ex) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
+                "timestamp", Instant.now().toString(),
+                "status", HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                "error", "Internal Server Error",
+                "message", ex.getMessage() == null ? "Unexpected server error" : ex.getMessage()
+        ));
+    }
 }

@@ -38,7 +38,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   Future<void> _pickImage() async {
     final ImagePicker picker = ImagePicker();
-    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+    final XFile? image = await picker.pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 85,
+      maxWidth: 1200,
+    );
 
     if (image != null) {
       setState(() {
@@ -88,30 +92,26 @@ class _RegisterScreenState extends State<RegisterScreen> {
       return;
     }
 
+    if (_profileImage == null) {
+      _showError('Profile picture is required');
+      return;
+    }
+
     setState(() => _isLoading = true);
 
     try {
-      String? profilePicUrl;
-      
-      // Upload profile picture if selected
-      if (_profileImage != null) {
-        try {
-          profilePicUrl = await ImageUploadService.uploadProfilePicture(_profileImage!);
-        } catch (e) {
-          // If upload fails, continue without profile picture
-          debugPrint('Failed to upload profile picture: $e');
-          // Optionally show a warning but don't block registration
-        }
-      }
+      // Upload profile picture first (required by backend).
+      final profilePicUrl = await ImageUploadService.uploadProfilePicture(
+        _profileImage!,
+      );
 
-      // Register with uploaded profile picture URL
       await AuthService.register(
         username: _usernameController.text.trim(),
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
         phone: _phoneController.text.trim(),
         locationAddress: _locationController.text.trim(),
-        profilePicUrl: profilePicUrl, // Use uploaded URL instead of local path
+        profilePicUrl: profilePicUrl,
       );
 
       if (mounted) {

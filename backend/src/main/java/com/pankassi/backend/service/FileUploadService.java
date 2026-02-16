@@ -35,7 +35,10 @@ public class FileUploadService {
 
         // Validate file type
         String contentType = file.getContentType();
-        if (contentType == null || !contentType.startsWith("image/")) {
+        String originalFilename = file.getOriginalFilename();
+        boolean isImageByContentType = contentType != null && contentType.startsWith("image/");
+        boolean isImageByExtension = hasImageExtension(originalFilename);
+        if (!isImageByContentType && !isImageByExtension) {
             throw new IllegalArgumentException("File must be an image");
         }
 
@@ -46,7 +49,6 @@ public class FileUploadService {
         }
 
         // Generate unique filename
-        String originalFilename = file.getOriginalFilename();
         String extension = "";
         if (originalFilename != null && originalFilename.contains(".")) {
             extension = originalFilename.substring(originalFilename.lastIndexOf("."));
@@ -62,6 +64,18 @@ public class FileUploadService {
         // Return public URL
         String publicUrl = baseUrl + "/api/files/profile-pictures/" + uniqueFilename;
         return publicUrl;
+    }
+
+    private boolean hasImageExtension(String filename) {
+        if (filename == null || !filename.contains(".")) return false;
+        String extension = filename.substring(filename.lastIndexOf(".") + 1).toLowerCase();
+        return extension.equals("jpg")
+                || extension.equals("jpeg")
+                || extension.equals("png")
+                || extension.equals("webp")
+                || extension.equals("gif")
+                || extension.equals("heic")
+                || extension.equals("heif");
     }
 
     /**

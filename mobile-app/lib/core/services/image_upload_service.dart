@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
 import 'package:flutter/foundation.dart';
 import '../api/api_constants.dart';
 
@@ -10,12 +11,20 @@ class ImageUploadService {
   static Future<String> uploadProfilePicture(File imageFile) async {
     try {
       final uri = Uri.parse('${ApiConstants.baseUrl}/upload-profile-pic');
-      
+
       var request = http.MultipartRequest('POST', uri);
-      
-      // Add the image file
+
+      final mediaType = _resolveMediaType(imageFile.path);
+      final safeName = 'profile_${DateTime.now().millisecondsSinceEpoch}.${mediaType.subtype}';
+
+      // Add the image file with explicit image content type.
       request.files.add(
-        await http.MultipartFile.fromPath('file', imageFile.path),
+        await http.MultipartFile.fromPath(
+          'file',
+          imageFile.path,
+          filename: safeName,
+          contentType: mediaType,
+        ),
       );
 
       debugPrint('Uploading profile picture to: $uri');
@@ -53,5 +62,19 @@ class ImageUploadService {
     } catch (_) {
       return body.length > 200 ? '${body.substring(0, 200)}...' : body;
     }
+  }
+
+  static MediaType _resolveMediaType(String path) {
+    final lower = path.toLowerCase();
+
+    if (lower.endsWith('.png')) return MediaType('image', 'png');
+    if (lower.endsWith('.webp')) return MediaType('image', 'webp');
+    if (lower.endsWith('.heic') || lower.endsWith('.heif')) {
+      return MediaType('image', 'heic');
+    }
+    if (lower.endsWith('.gif')) return MediaType('image', 'gif');
+
+    // Default common camera/gallery output on Android.
+    return MediaType('image', 'jpeg');
   }
 }

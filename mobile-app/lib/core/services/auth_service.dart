@@ -35,7 +35,7 @@ class AuthService {
     required String password,
     required String phone,
     required String locationAddress,
-    String? profilePicUrl,
+    required String profilePicUrl,
   }) async {
     final response = await ApiClient.postNoAuth(ApiConstants.registerEndpoint, {
       'username': username,
@@ -43,7 +43,7 @@ class AuthService {
       'password': password,
       'phone': phone,
       'locationAddress': locationAddress,
-      'profilePicUrl': profilePicUrl ?? '',
+      'profilePicUrl': profilePicUrl,
     });
 
     debugPrint('Register status: ${response.statusCode}');

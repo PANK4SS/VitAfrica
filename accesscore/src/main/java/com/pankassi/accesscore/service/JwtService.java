@@ -8,6 +8,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.security.Key;
 import java.util.Date;
 import java.util.HashSet;
@@ -27,9 +30,28 @@ public class JwtService {
 
     // Génération de la clé de signature
     private Key getSigningKey() {
-        // Assure-toi que ta clé secrète fait au moins 256 bits (32 chars)
-        byte[] keyBytes = secret.getBytes();
+        byte[] keyBytes = normalizeSecret(secret);
         return Keys.hmacShaKeyFor(keyBytes);
+    }
+
+    /**
+     * Ensure at least 256-bit key material even if environment secret is short.
+     * This prevents runtime WeakKeyException during token generation.
+     */
+    private byte[] normalizeSecret(String rawSecret) {
+        String safeSecret = rawSecret != null ? rawSecret : "";
+        byte[] original = safeSecret.getBytes(StandardCharsets.UTF_8);
+
+        if (original.length >= 32) {
+            return original;
+        }
+
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            return digest.digest(original);
+        } catch (NoSuchAlgorithmException e) {
+            throw new IllegalStateException("Unable to initialize JWT signing key", e);
+        }
     }
 
     public String generateToken(Client client) {
