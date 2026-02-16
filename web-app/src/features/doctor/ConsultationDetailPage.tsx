@@ -18,6 +18,7 @@ import { doctorApi } from '../../core/api/doctorApi';
 import { useAuth } from '../../core/auth/AuthContext';
 import type { ConsultationDetailResponse } from '../../core/types/api';
 import { StatusPill } from '../../shared/components/StatusPill';
+import { ProfileAvatar } from '../../shared/components/ProfileAvatar';
 
 interface ConsultationDetailPageProps {
   appointmentId: number;
@@ -159,7 +160,10 @@ export function ConsultationDetailPage({ appointmentId }: ConsultationDetailPage
               <>
                 <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--line-soft)', paddingBottom: '0.5rem' }}>
                   <span className="muted">Full Name</span>
-                  <span style={{ fontWeight: 600 }}>{detail.patientName}</span>
+                  <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 600 }}>
+                    <ProfileAvatar src={detail.patientProfilePic} alt={detail.patientName} size={30} />
+                    {detail.patientName}
+                  </span>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--line-soft)', paddingBottom: '0.5rem' }}>
                   <span className="muted">Contact</span>

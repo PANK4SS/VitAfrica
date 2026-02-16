@@ -31,6 +31,14 @@ export function AuthProvider({ children }: PropsWithChildren) {
     const jwtPayload = decodeJwtPayload(response.accessToken);
     const authorities = jwtPayload?.authorities ?? [];
     const nextRole = resolveRole(authorities);
+    let profilePicUrl: string | undefined;
+
+    try {
+      const me = await authApi.getCurrentUser(response.accessToken);
+      profilePicUrl = me.profilePicUrl ?? undefined;
+    } catch {
+      profilePicUrl = undefined;
+    }
 
     const nextSession: AuthSession = {
       accessToken: response.accessToken,
@@ -39,7 +47,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
       clientName: response.clientName,
       role: nextRole,
       authorities,
-      profilePicUrl: (response as any).profilePicUrl, // Optional
+      profilePicUrl,
     };
 
     setSession(nextSession);

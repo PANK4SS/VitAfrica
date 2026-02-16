@@ -14,6 +14,7 @@ import {
 import { useAuth } from '../../core/auth/AuthContext';
 import type { UserRole } from '../../core/types/domain';
 import { navigateTo, useHashPath } from '../../app/router';
+import { ProfileAvatar } from '../components/ProfileAvatar';
 
 interface NavItem {
   label: string;
@@ -68,11 +69,7 @@ export function AppShell({ children }: PropsWithChildren) {
         </header>
 
         <section className="shell__user">
-          <img
-            src={session?.profilePicUrl || 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80'}
-            alt="User"
-            className="shell__user-avatar"
-          />
+          <ProfileAvatar src={session?.profilePicUrl} alt="User" className="shell__user-avatar" size={44} />
           <div className="shell__user-info">
             <h4>{session?.clientName || 'Dr. Professional'}</h4>
             <p>{role.toLowerCase().replace('_', ' ')}</p>

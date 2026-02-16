@@ -3,6 +3,7 @@ import type {
   LoginPayload,
   RegisterPayload,
   UploadProfilePictureResponse,
+  WebCurrentUserResponse,
 } from '../types/api';
 import { httpRequest } from './httpClient';
 
@@ -12,6 +13,10 @@ export const authApi = {
       method: 'POST',
       body: payload,
     });
+  },
+
+  getCurrentUser(token: string): Promise<WebCurrentUserResponse> {
+    return httpRequest('/api/authentication/web/me', { token });
   },
 
   register(payload: RegisterPayload): Promise<string> {

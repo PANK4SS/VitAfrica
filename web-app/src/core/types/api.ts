@@ -22,6 +22,12 @@ export interface AuthenticationResponse {
   clientName: string;
 }
 
+export interface WebCurrentUserResponse {
+  email: string;
+  clientName: string;
+  profilePicUrl: string | null;
+}
+
 export interface AdminDashboardResponse {
   patientNumber: number;
   doctorNumber: number;

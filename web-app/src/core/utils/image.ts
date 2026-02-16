@@ -49,3 +49,31 @@ export async function compressImage(file: File): Promise<Blob> {
         reader.onerror = (err) => reject(err);
     });
 }
+
+const DEFAULT_API_BASE_URL = 'https://vitafrica-production.up.railway.app';
+
+export function resolveImageUrl(url?: string | null): string | undefined {
+    if (!url) return undefined;
+
+    const trimmed = url.trim();
+    if (!trimmed) return undefined;
+
+    // Ignore known backend placeholder value.
+    if (trimmed.includes('default-admin.png')) return undefined;
+
+    if (
+        trimmed.startsWith('http://') ||
+        trimmed.startsWith('https://') ||
+        trimmed.startsWith('data:') ||
+        trimmed.startsWith('blob:')
+    ) {
+        return trimmed;
+    }
+
+    const base = (import.meta.env.VITE_API_BASE_URL ?? DEFAULT_API_BASE_URL).replace(/\/+$/, '');
+    if (trimmed.startsWith('/')) {
+        return `${base}${trimmed}`;
+    }
+
+    return `${base}/${trimmed}`;
+}

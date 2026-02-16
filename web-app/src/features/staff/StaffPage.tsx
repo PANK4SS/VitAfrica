@@ -21,6 +21,7 @@ import type {
   StaffDashboardResponse,
 } from '../../core/types/api';
 import { StatCard } from '../../shared/components/StatCard';
+import { ProfileAvatar } from '../../shared/components/ProfileAvatar';
 
 export function StaffPage() {
   const { session } = useAuth();
@@ -143,8 +144,13 @@ export function StaffPage() {
                     {patients.slice(0, 5).map(p => (
                       <tr key={p.patientId}>
                         <td>
-                          <div style={{ fontWeight: 600, color: 'var(--primary)' }}>{p.fullName}</div>
-                          <div className="muted" style={{ fontSize: '0.75rem' }}>{p.phone}</div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem' }}>
+                            <ProfileAvatar src={p.profilePicUrl} alt={p.fullName} size={32} />
+                            <div>
+                              <div style={{ fontWeight: 600, color: 'var(--primary)' }}>{p.fullName}</div>
+                              <div className="muted" style={{ fontSize: '0.75rem' }}>{p.phone}</div>
+                            </div>
+                          </div>
                         </td>
                         <td style={{ textAlign: 'right' }}>
                           <span className="badge badge--success">Active</span>
@@ -259,8 +265,13 @@ export function StaffPage() {
                 {patients.map(p => (
                   <tr key={p.patientId}>
                     <td>
-                      <div style={{ fontWeight: 600, color: 'var(--primary)' }}>{p.fullName}</div>
-                      <div className="muted" style={{ fontSize: '0.75rem', fontFamily: 'monospace' }}>#PAT-{p.patientId}</div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem' }}>
+                        <ProfileAvatar src={p.profilePicUrl} alt={p.fullName} size={32} />
+                        <div>
+                          <div style={{ fontWeight: 600, color: 'var(--primary)' }}>{p.fullName}</div>
+                          <div className="muted" style={{ fontSize: '0.75rem', fontFamily: 'monospace' }}>#PAT-{p.patientId}</div>
+                        </div>
+                      </div>
                     </td>
                     <td>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}><Phone size={14} className="muted" /> {p.phone}</div>

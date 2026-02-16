@@ -23,6 +23,7 @@ import type {
 } from '../../core/types/api';
 import { StatCard } from '../../shared/components/StatCard';
 import { StatusPill } from '../../shared/components/StatusPill';
+import { ProfileAvatar } from '../../shared/components/ProfileAvatar';
 
 export function AdminPage() {
   const { session } = useAuth();
@@ -185,7 +186,12 @@ export function AdminPage() {
                   <tbody>
                     {requests.slice(0, 5).map(req => (
                       <tr key={req.profileId}>
-                        <td style={{ fontWeight: 600, color: 'var(--primary)' }}>{req.fullName}</td>
+                        <td>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem' }}>
+                            <ProfileAvatar src={req.profilePicUrl} alt={req.fullName} size={32} />
+                            <span style={{ fontWeight: 600, color: 'var(--primary)' }}>{req.fullName}</span>
+                          </div>
+                        </td>
                         <td>{req.email}</td>
                         <td>
                           <div style={{ display: 'flex', gap: '0.5rem' }}>
@@ -253,7 +259,12 @@ export function AdminPage() {
               <tbody>
                 {requests.map(req => (
                   <tr key={req.profileId} style={{ background: approvingId === req.profileId ? 'var(--surface-muted)' : 'transparent' }}>
-                    <td style={{ fontWeight: 600 }}>{req.fullName}</td>
+                    <td>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem' }}>
+                        <ProfileAvatar src={req.profilePicUrl} alt={req.fullName} size={32} />
+                        <span style={{ fontWeight: 600 }}>{req.fullName}</span>
+                      </div>
+                    </td>
                     <td>{req.email}</td>
                     <td><StatusPill value="PENDING" /></td>
                     <td>
@@ -334,7 +345,12 @@ export function AdminPage() {
               <tbody>
                 {personnel.map(p => (
                   <tr key={p.clientId}>
-                    <td style={{ fontWeight: 600 }}>{p.fullName}</td>
+                    <td>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem' }}>
+                        <ProfileAvatar src={p.profilePicUrl} alt={p.fullName} size={32} />
+                        <span style={{ fontWeight: 600 }}>{p.fullName}</span>
+                      </div>
+                    </td>
                     <td><span className="badge badge--approved">{p.role}</span></td>
                     <td><span className="muted">{p.department || 'N/A'}</span></td>
                     <td>{p.email}</td>
