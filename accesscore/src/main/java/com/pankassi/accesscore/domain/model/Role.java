@@ -34,7 +34,7 @@ public class Role {
     @JsonManagedReference
     private Set<Client> clientSet;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JsonIgnore
     @JoinTable(
             name = "RoleResource",
