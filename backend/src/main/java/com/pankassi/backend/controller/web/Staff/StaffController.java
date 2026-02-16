@@ -1,6 +1,7 @@
 package com.pankassi.backend.controller.web.Staff;
 
 import com.pankassi.backend.dto.request.CreateAppointmentRequest;
+import com.pankassi.backend.dto.request.CreateVitalSignRequest;
 // ✅ Import correct — package "staff" en minuscules
 import com.pankassi.backend.dto.response.staff.DoctorSummaryResponse;
 import com.pankassi.backend.dto.response.staff.PatientSummaryResponse;
@@ -43,6 +44,13 @@ public class StaffController {
     public ResponseEntity<Void> createAppointment(
             @Valid @RequestBody CreateAppointmentRequest request) {
         staffService.createAppointment(request);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @PostMapping("/vital-signs")
+    public ResponseEntity<Void> recordVitalSigns(
+            @Valid @RequestBody CreateVitalSignRequest request) {
+        staffService.recordVitalSigns(request);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 }

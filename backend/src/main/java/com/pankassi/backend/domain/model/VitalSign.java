@@ -11,12 +11,12 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "vitalSign")
+@Table(name = "vital_sign")
 public class VitalSign {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "vitalSignId")
+    @Column(name = "vital_sign_id")
     private Long vitalSignId;
 
     @Column(name = "blood_pressure")
