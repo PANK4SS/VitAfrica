@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../core/api/api_constants.dart';
@@ -16,11 +17,24 @@ class _LabResultsScreenState extends State<LabResultsScreen> {
   List<LabResultResponse>? _labResults;
   bool _isLoading = true;
   String? _error;
+  Timer? _refreshTimer;
 
   @override
   void initState() {
     super.initState();
     _loadData();
+    // Auto-refresh lab results so newly uploaded reports from the web appear automatically.
+    _refreshTimer = Timer.periodic(const Duration(seconds: 45), (_) {
+      if (mounted) {
+        _loadData();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _refreshTimer?.cancel();
+    super.dispose();
   }
 
   Future<void> _loadData() async {
@@ -52,11 +66,21 @@ class _LabResultsScreenState extends State<LabResultsScreen> {
     }
 
     final normalized = fileUrl.trim();
-    final resolved = normalized.startsWith('http://') || normalized.startsWith('https://')
-        ? normalized
-        : normalized.startsWith('/')
-            ? '${ApiConstants.baseHost}$normalized'
-            : '${ApiConstants.baseHost}/$normalized';
+
+    // Fix legacy URLs that still point to an old local IP by mapping them to the current public backend host.
+    const legacyHost = 'http://192.168.100.202:8080';
+    String resolved;
+    if (normalized.startsWith(legacyHost)) {
+      final path = normalized.substring(legacyHost.length);
+      final normalizedPath = path.startsWith('/') ? path : '/$path';
+      resolved = '${ApiConstants.baseHost}$normalizedPath';
+    } else {
+      resolved = normalized.startsWith('http://') || normalized.startsWith('https://')
+          ? normalized
+          : normalized.startsWith('/')
+              ? '${ApiConstants.baseHost}$normalized'
+              : '${ApiConstants.baseHost}/$normalized';
+    }
 
     final uri = Uri.tryParse(resolved);
     if (uri == null) {

@@ -51,6 +51,7 @@ export async function compressImage(file: File): Promise<Blob> {
 }
 
 const DEFAULT_API_BASE_URL = 'https://vitafrica-production.up.railway.app';
+const LEGACY_DEV_HOST = 'http://192.168.100.202:8080';
 
 export function resolveImageUrl(url?: string | null): string | undefined {
     if (!url) return undefined;
@@ -60,6 +61,19 @@ export function resolveImageUrl(url?: string | null): string | undefined {
 
     // Ignore known backend placeholder value.
     if (trimmed.includes('default-admin.png')) return undefined;
+
+    // Migrate legacy dev URLs (old local IP) to the current API base URL
+    if (trimmed.startsWith(LEGACY_DEV_HOST)) {
+        const base = (import.meta.env.VITE_API_BASE_URL ?? DEFAULT_API_BASE_URL).replace(/\/+$/, '');
+        const path = trimmed.substring(LEGACY_DEV_HOST.length);
+        if (!path) {
+            return base;
+        }
+        if (path.startsWith('/')) {
+            return `${base}${path}`;
+        }
+        return `${base}/${path}`;
+    }
 
     if (
         trimmed.startsWith('http://') ||

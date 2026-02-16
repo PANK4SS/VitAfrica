@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import '../../core/theme/colors.dart';
 import '../../core/services/patient_service.dart';
@@ -14,11 +15,24 @@ class _PrescriptionsScreenState extends State<PrescriptionsScreen> {
   List<PrescriptionResponse>? _prescriptions;
   bool _isLoading = true;
   String? _error;
+  Timer? _refreshTimer;
 
   @override
   void initState() {
     super.initState();
     _loadData();
+    // Auto-refresh prescriptions so new prescriptions created from the web app appear automatically.
+    _refreshTimer = Timer.periodic(const Duration(seconds: 45), (_) {
+      if (mounted) {
+        _loadData();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _refreshTimer?.cancel();
+    super.dispose();
   }
 
   Future<void> _loadData() async {

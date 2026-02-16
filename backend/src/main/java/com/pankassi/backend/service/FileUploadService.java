@@ -19,7 +19,10 @@ public class FileUploadService {
     @Value("${app.upload.dir:uploads}")
     private String uploadDir;
 
-    @Value("${app.base.url:http://192.168.100.202:8080}")
+    // Public base URL of the backend used to build file URLs.
+    // In production on Railway, this should point to the HTTPS edge URL.
+    // You can override it with the `app.base.url` property if needed.
+    @Value("${app.base.url:https://vitafrica-production.up.railway.app}")
     private String baseUrl;
 
     /**

@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:async';
 import 'package:flutter/material.dart';
 import '../../core/api/api_constants.dart';
 import '../../core/theme/colors.dart';
@@ -18,11 +19,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
   ProfileResponse? _profile;
   bool _isLoading = true;
   String? _error;
+  Timer? _refreshTimer;
 
   @override
   void initState() {
     super.initState();
     _loadData();
+  }
+
+  @override
+  void dispose() {
+    _refreshTimer?.cancel();
+    super.dispose();
   }
 
   Future<void> _loadData() async {
@@ -34,6 +42,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
           _isLoading = false;
         });
       }
+      // Start auto-refresh once the first profile is loaded, so avatar changes propagate automatically.
+      _refreshTimer ??= Timer.periodic(const Duration(seconds: 45), (_) async {
+        try {
+          final refreshed = await PatientService.getProfile();
+          if (mounted) {
+            setState(() {
+              _profile = refreshed;
+            });
+          }
+        } catch (_) {
+          // Ignore periodic refresh errors to avoid disturbing the user.
+        }
+      });
     } catch (e) {
       if (mounted) {
         setState(() {
@@ -178,6 +199,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
     if (imagePath == null || imagePath.isEmpty) return null;
 
     final value = imagePath.trim();
+
+    // Fix legacy URLs that still point to an old local IP by mapping them to the current public backend host.
+    const legacyHost = 'http://192.168.100.202:8080';
+    if (value.startsWith(legacyHost)) {
+      final path = value.substring(legacyHost.length);
+      final normalizedPath = path.startsWith('/') ? path : '/$path';
+      return NetworkImage('${ApiConstants.baseHost}$normalizedPath');
+    }
 
     // Absolute URL.
     if (value.startsWith('http://') || value.startsWith('https://')) {

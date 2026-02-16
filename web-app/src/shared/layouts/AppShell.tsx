@@ -7,7 +7,6 @@ import {
   LogOut,
   CalendarCheck2,
   Stethoscope,
-  Bell,
   Search,
   Menu
 } from 'lucide-react';
@@ -128,10 +127,6 @@ export function AppShell({ children }: PropsWithChildren) {
                 style={{ width: '240px', paddingLeft: '2.5rem', height: '36px', fontSize: '0.8125rem' }}
               />
             </div>
-            <button style={{ position: 'relative', background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--ink-soft)' }}>
-              <Bell size={20} />
-              <span style={{ position: 'absolute', top: -2, right: -2, width: '8px', height: '8px', background: 'var(--secondary)', borderRadius: '50%', border: '2px solid white' }}></span>
-            </button>
           </div>
         </header>
 

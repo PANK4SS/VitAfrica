@@ -32,8 +32,10 @@ export function DoctorPage() {
     if (!session) return;
     const token = session.accessToken;
 
-    async function load() {
-      setLoading(true);
+    async function load(withLoading: boolean) {
+      if (withLoading) {
+        setLoading(true);
+      }
       try {
         const [dashData, consultationsData] = await Promise.all([
           doctorApi.getDashboard(token).catch(() => null),
@@ -44,11 +46,23 @@ export function DoctorPage() {
       } catch (err) {
         setError('Unable to fetch clinical schedules.');
       } finally {
-        setLoading(false);
+        if (withLoading) {
+          setLoading(false);
+        }
       }
     }
 
-    void load();
+    // Initial load
+    void load(true);
+
+    // Lightweight polling so doctors see new appointments/updates without refreshing.
+    const intervalId = window.setInterval(() => {
+      void load(false);
+    }, 15000);
+
+    return () => {
+      window.clearInterval(intervalId);
+    };
   }, [session]);
 
   const ongoingConsultations = consultations.filter(c => c.status !== 'COMPLETED');

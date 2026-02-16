@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:async';
 import 'package:flutter/material.dart';
 import '../../core/api/api_constants.dart';
 import '../../core/theme/colors.dart';
@@ -16,11 +17,24 @@ class _HomeScreenState extends State<HomeScreen> {
   HomeResponse? _homeData;
   bool _isLoading = true;
   String? _error;
+  Timer? _refreshTimer;
 
   @override
   void initState() {
     super.initState();
     _loadData();
+    // Auto-refresh home data periodically so patients see new appointments/vital signs without manual refresh.
+    _refreshTimer = Timer.periodic(const Duration(seconds: 30), (_) {
+      if (mounted) {
+        _loadData();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _refreshTimer?.cancel();
+    super.dispose();
   }
 
   Future<void> _loadData() async {
@@ -152,6 +166,14 @@ class _HomeScreenState extends State<HomeScreen> {
     if (imagePath == null || imagePath.isEmpty) return null;
 
     final value = imagePath.trim();
+
+    // Fix legacy URLs that still point to an old local IP by mapping them to the current public backend host.
+    const legacyHost = 'http://192.168.100.202:8080';
+    if (value.startsWith(legacyHost)) {
+      final path = value.substring(legacyHost.length);
+      final normalizedPath = path.startsWith('/') ? path : '/$path';
+      return NetworkImage('${ApiConstants.baseHost}$normalizedPath');
+    }
 
     // Absolute URL.
     if (value.startsWith('http://') || value.startsWith('https://')) {

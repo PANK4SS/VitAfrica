@@ -62,6 +62,20 @@ export function StaffPage() {
     void loadInitial();
   }, [session]);
 
+  // Lightweight polling so staff dashboards stay in sync without manual refresh.
+  useEffect(() => {
+    if (!session) return;
+    const token = session.accessToken;
+
+    const intervalId = window.setInterval(() => {
+      void loadData(token, searchTerm);
+    }, 20000);
+
+    return () => {
+      window.clearInterval(intervalId);
+    };
+  }, [session, searchTerm]);
+
   // Debounced search effect
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -110,11 +124,6 @@ export function StaffPage() {
             {currentTab === 'appointments' && 'Schedule and manage medical consultations'}
           </p>
         </div>
-        {currentTab === 'patients' && (
-          <button className="btn btn--secondary" onClick={() => setError('Direct clinical registration available on mobile only.')}>
-            <Plus size={18} /> New Patient
-          </button>
-        )}
       </header>
 
       {error && (
