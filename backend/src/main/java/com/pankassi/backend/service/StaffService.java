@@ -8,6 +8,7 @@ import com.pankassi.backend.dto.request.CreateAppointmentRequest;
 import com.pankassi.backend.dto.response.staff.DoctorSummaryResponse;
 import com.pankassi.backend.dto.response.staff.PatientSummaryResponse;
 import com.pankassi.backend.dto.response.staff.StaffDashboardResponse;
+import com.pankassi.backend.domain.repository.web.UserProfileRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +23,7 @@ public class StaffService {
     private final PatientRepository patientRepository;
     private final DoctorRepository doctorRepository;
     private final AppointmentRepository appointmentRepository;
+    private final UserProfileRepository userProfileRepository;
 
     // ===== DASHBOARD =====
     @Transactional(readOnly = true)
@@ -55,7 +57,10 @@ public class StaffService {
                 .map(d -> new DoctorSummaryResponse(
                         d.getDoctorId(),
                         d.getClient().getClientName(),
-                        d.getDepartment()
+                        d.getDepartment(),
+                        userProfileRepository.findByClientClientId(d.getClient().getClientId())
+                                .map(UserProfile::getProfilePicUrl)
+                                .orElse(null)
                 ))
                 .toList();
     }

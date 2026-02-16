@@ -7,7 +7,6 @@ import com.pankassi.accesscore.dto.response.AuthenticationResponse;
 import com.pankassi.accesscore.dto.response.ClientResponse;
 import com.pankassi.accesscore.service.AuthenticationService;
 import com.pankassi.backend.domain.model.Appointment;
-import com.pankassi.backend.domain.model.Doctor;
 import com.pankassi.backend.domain.model.Patient;
 import com.pankassi.backend.domain.model.VitalSign;
 import com.pankassi.backend.domain.repository.*;
@@ -39,7 +38,6 @@ public class PatientService {
     private final VitalSignRepository vitalSignRepository;
 
     private final LabResultRepository labResultRepository;
-    private final DoctorRepository doctorRepository;
 
     //Patient Registration
     public ClientResponse registerPatient (RegisterPatientRequest registerPatientRequest,String roleName){
@@ -65,6 +63,13 @@ public class PatientService {
 
     //Login Patient
     public AuthenticationResponse loginPatient(LoginRequest loginRequest){
+        Client client = clientRepository.findByEmail(loginRequest.email())
+                .orElseThrow(() -> new IllegalArgumentException("Invalid email or password"));
+
+        if (patientRepository.findByClient(client).isEmpty()) {
+            throw new IllegalArgumentException("Patient account not found");
+        }
+
         return authenticationService.login(loginRequest);
     }
 
@@ -86,21 +91,8 @@ public class PatientService {
 
     @Transactional(readOnly = true)
     public MobileHomeResponse getMobileHomeInfo(){
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        if (authentication == null || !authentication.isAuthenticated()) {
-            throw new IllegalStateException("User not authenticated");
-        }
-        String email = authentication.getName();
-
-        // Client & Patient
-        Client client = clientRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
-
-        Patient patient = patientRepository.findByClient(client)
-                .orElseThrow(() -> new IllegalArgumentException("Patient profile not found"));
-
-        Doctor doctor = doctorRepository.findByClient(client).orElseThrow(()-> new IllegalArgumentException("Doctor profile not found"));
+        Patient patient = getAuthenticatedPatient();
+        Client client = patient.getClient();
 
         // ===== APPOINTMENT =====
         Optional<Appointment> appointmentOpt = appointmentRepository
@@ -118,8 +110,8 @@ public class PatientService {
             appointmentStatus = appointment.getStatus();
 
             if (appointment.getDoctor() != null) {
-                doctorName       = doctor.getClient().getClientName();
-                doctorDepartment = doctor.getDepartment();
+                doctorName       = appointment.getDoctor().getClient().getClientName();
+                doctorDepartment = appointment.getDoctor().getDepartment();
             }
         }
 
@@ -164,20 +156,7 @@ public class PatientService {
 
     @Transactional(readOnly = true)
     public List<AppointmentResponse> getPatientAppointments() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        if (authentication == null || !authentication.isAuthenticated()) {
-            throw new IllegalStateException("User not authenticated");
-        }
-
-        Client client = clientRepository.findByEmail(authentication.getName())
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
-
-        Patient patient = patientRepository.findByClient(client)
-                .orElseThrow(() -> new IllegalArgumentException("Patient profile not found"));
-
-        Doctor doctor = doctorRepository.findByClient(client).orElseThrow(()-> new IllegalArgumentException("Doctor profile not found"));
-        String doctorName = doctor.getClient().getClientName();
+        Patient patient = getAuthenticatedPatient();
 
         List<Appointment> appointments = appointmentRepository
                 .findByPatientAndStatusInOrderByDateTimeDesc(
@@ -193,7 +172,7 @@ public class PatientService {
                         appointment.getDateTime().toLocalTime()
                                 .format(DateTimeFormatter.ofPattern("HH:mm")),
                         appointment.getStatus(),
-                        appointment.getDoctor() != null ? doctorName: null,
+                        appointment.getDoctor() != null ? appointment.getDoctor().getClient().getClientName() : null,
                         appointment.getDoctor() != null ? appointment.getDoctor().getDepartment() : null
                 ))
                 .toList();
@@ -202,20 +181,8 @@ public class PatientService {
 
     @Transactional(readOnly = true)
     public List<PrescriptionResponse> getPatientPrescriptions() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Patient patient = getAuthenticatedPatient();
 
-        if (authentication == null || !authentication.isAuthenticated()) {
-            throw new IllegalStateException("User not authenticated");
-        }
-
-        Client client = clientRepository.findByEmail(authentication.getName())
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
-
-        Patient patient = patientRepository.findByClient(client)
-                .orElseThrow(() -> new IllegalArgumentException("Patient profile not found"));
-
-        Doctor doctor = doctorRepository.findByClient(client).orElseThrow(()-> new IllegalArgumentException("Doctor profile not found"));
-        String doctorName = doctor.getClient().getClientName();
         return prescriptionRepository
                 .findByPatientOrderByPrescriptionDateDesc(patient)
                 .stream()
@@ -223,7 +190,7 @@ public class PatientService {
                         prescription.getPrescriptionId(),
                         prescription.getPrescriptionDate()
                                 .format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),
-                        doctorName,
+                        prescription.getDoctor().getClient().getClientName(),
                         prescription.getDoctor().getDepartment(),
                         prescription.getDrugs().stream()
                                 .map(drug -> new DrugResponse(
@@ -259,14 +226,8 @@ public class PatientService {
     // ===== PROFILE =====
     @Transactional(readOnly = true)
     public PatientProfileResponse getPatientProfile() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String email = authentication.getName();
-
-        Client client = clientRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
-
-        Patient patient = patientRepository.findByClient(client)
-                .orElseThrow(() -> new IllegalArgumentException("Patient profile not found"));
+        Patient patient = getAuthenticatedPatient();
+        Client client = patient.getClient();
 
         return new PatientProfileResponse(
                 patient.getProfilePicUrl(),
