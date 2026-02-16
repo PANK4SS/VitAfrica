@@ -37,6 +37,7 @@ export function AdminPage() {
   const [personnel, setPersonnel] = useState<PersonnelResponse[]>([]);
   const [departments, setDepartments] = useState<DepartmentResponse[]>([]);
   const [departmentName, setDepartmentName] = useState('');
+  const [personnelSearch, setPersonnelSearch] = useState('');
 
   // Local state for approval modal
   const [approvingId, setApprovingId] = useState<number | null>(null);
@@ -74,6 +75,23 @@ export function AdminPage() {
 
     void load();
   }, [session]);
+
+  useEffect(() => {
+    if (!session) return;
+    if (currentTab !== 'personnel') return;
+    const timer = setTimeout(async () => {
+      try {
+        const data = await adminApi.getPersonnel(session.accessToken, {
+          search: personnelSearch,
+        });
+        setPersonnel(data);
+      } catch {
+        setError('Unable to search personnel');
+      }
+    }, 350);
+
+    return () => clearTimeout(timer);
+  }, [session, personnelSearch, currentTab]);
 
   const approve = async () => {
     if (!session || !approvingId) return;
@@ -328,7 +346,14 @@ export function AdminPage() {
             <h3>Active Clinical Personnel</h3>
             <div style={{ position: 'relative' }}>
               <Search size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--ink-muted)' }} />
-              <input type="text" className="input-style" placeholder="Search staff..." style={{ paddingLeft: '2.5rem', height: '36px', fontSize: '0.875rem' }} />
+              <input
+                type="text"
+                className="input-style"
+                placeholder="Search staff..."
+                style={{ paddingLeft: '2.5rem', height: '36px', fontSize: '0.875rem' }}
+                value={personnelSearch}
+                onChange={e => setPersonnelSearch(e.target.value)}
+              />
             </div>
           </div>
           <div className="table-wrap">

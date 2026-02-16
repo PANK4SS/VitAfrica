@@ -34,8 +34,20 @@ export const adminApi = {
     });
   },
 
-  getPersonnel(token: string): Promise<PersonnelResponse[]> {
-    return httpRequest('/api/admin/personnel', { token });
+  getPersonnel(
+    token: string,
+    filters: { role?: string; search?: string } = {},
+  ): Promise<PersonnelResponse[]> {
+    const params = new URLSearchParams();
+    if (filters.role?.trim()) {
+      params.set('role', filters.role.trim());
+    }
+    if (filters.search?.trim()) {
+      params.set('search', filters.search.trim());
+    }
+    const query = params.toString();
+    const path = query ? `/api/admin/personnel?${query}` : '/api/admin/personnel';
+    return httpRequest(path, { token });
   },
 
   getDepartments(token: string): Promise<DepartmentResponse[]> {

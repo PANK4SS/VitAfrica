@@ -2,13 +2,13 @@ class DrugResponse {
   final String drugName;
   final String dosage;
   final String frequency;
-  final String duration;
+  final String durationDays;
 
   DrugResponse({
     required this.drugName,
     required this.dosage,
     required this.frequency,
-    required this.duration,
+    required this.durationDays,
   });
 
   factory DrugResponse.fromJson(Map<String, dynamic> json) {
@@ -16,7 +16,7 @@ class DrugResponse {
       drugName: json['drugName'] ?? '',
       dosage: json['dosage'] ?? '',
       frequency: json['frequency'] ?? '',
-      duration: json['duration'] ?? '',
+      durationDays: json['durationDays'] ?? '',
     );
   }
 }

@@ -75,6 +75,7 @@ export interface DoctorSummaryResponse {
   doctorId: number;
   fullName: string;
   department: string;
+  profilePicUrl: string | null;
 }
 
 export interface CreateAppointmentPayload {

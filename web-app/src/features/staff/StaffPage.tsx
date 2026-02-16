@@ -173,8 +173,13 @@ export function StaffPage() {
                     {doctors.slice(0, 5).map(d => (
                       <tr key={d.doctorId}>
                         <td>
-                          <div style={{ fontWeight: 600 }}>{d.fullName}</div>
-                          <div className="muted" style={{ fontSize: '0.75rem' }}>#{d.doctorId} - {d.department}</div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem' }}>
+                            <ProfileAvatar src={d.profilePicUrl} alt={d.fullName} size={32} />
+                            <div>
+                              <div style={{ fontWeight: 600 }}>{d.fullName}</div>
+                              <div className="muted" style={{ fontSize: '0.75rem' }}>#{d.doctorId} - {d.department}</div>
+                            </div>
+                          </div>
                         </td>
                         <td style={{ textAlign: 'right' }}>
                           <button className="btn btn--ghost btn--small">Profile</button>

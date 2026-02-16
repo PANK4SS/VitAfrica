@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
+import '../../core/api/api_constants.dart';
 import '../../core/theme/colors.dart';
 import '../../core/services/patient_service.dart';
 import '../../core/models/lab_result_response.dart';
@@ -37,6 +39,39 @@ class _LabResultsScreenState extends State<LabResultsScreen> {
           _isLoading = false;
         });
       }
+    }
+  }
+
+  Future<void> _openLabResult(String fileUrl) async {
+    if (fileUrl.isEmpty) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('File URL is missing')),
+      );
+      return;
+    }
+
+    final normalized = fileUrl.trim();
+    final resolved = normalized.startsWith('http://') || normalized.startsWith('https://')
+        ? normalized
+        : normalized.startsWith('/')
+            ? '${ApiConstants.baseHost}$normalized'
+            : '${ApiConstants.baseHost}/$normalized';
+
+    final uri = Uri.tryParse(resolved);
+    if (uri == null) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Invalid file URL')),
+      );
+      return;
+    }
+
+    final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
+    if (!launched && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Unable to open file')),
+      );
     }
   }
 
@@ -225,9 +260,7 @@ class _LabResultsScreenState extends State<LabResultsScreen> {
                 color: AppColors.primary,
                 size: 22,
               ),
-              onPressed: () {
-                // TODO: Implement download using lab.fileUrl
-              },
+              onPressed: () => _openLabResult(lab.fileUrl),
             ),
           ),
         ],

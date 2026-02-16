@@ -336,7 +336,7 @@ class _PrescriptionCardState extends State<_PrescriptionCard> {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  '${drug.dosage} · ${drug.frequency} · ${drug.duration}',
+                  '${drug.dosage} · ${drug.frequency} · ${drug.durationDays}',
                   style: TextStyle(fontSize: 12, color: Colors.grey[600]),
                 ),
               ],

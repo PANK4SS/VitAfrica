@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import '../../core/api/api_constants.dart';
 import '../../core/theme/colors.dart';
 import '../../core/services/patient_service.dart';
 import '../../core/services/auth_service.dart';
@@ -175,24 +176,33 @@ class _ProfileScreenState extends State<ProfileScreen> {
   /// Helper function to get the correct ImageProvider (FileImage for local paths, NetworkImage for URLs)
   ImageProvider? _getImageProvider(String? imagePath) {
     if (imagePath == null || imagePath.isEmpty) return null;
-    
-    // Check if it's a local file path (starts with / or file://)
-    if (imagePath.startsWith('/') || imagePath.startsWith('file://')) {
+
+    final value = imagePath.trim();
+
+    // Absolute URL.
+    if (value.startsWith('http://') || value.startsWith('https://')) {
+      return NetworkImage(value);
+    }
+
+    // Relative API URL.
+    if (value.startsWith('/api/')) {
+      return NetworkImage('${ApiConstants.baseHost}$value');
+    }
+    if (value.startsWith('api/')) {
+      return NetworkImage('${ApiConstants.baseHost}/$value');
+    }
+
+    // Local file path.
+    if (value.startsWith('/') || value.startsWith('file://')) {
       // Remove file:// prefix if present
-      final cleanPath = imagePath.replaceFirst('file://', '');
+      final cleanPath = value.replaceFirst('file://', '');
       final file = File(cleanPath);
       if (file.existsSync()) {
         return FileImage(file);
       }
       return null;
     }
-    
-    // Check if it's an HTTP/HTTPS URL
-    if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
-      return NetworkImage(imagePath);
-    }
-    
-    // If it doesn't match any pattern, return null
+
     return null;
   }
 

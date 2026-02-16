@@ -10,7 +10,6 @@ import com.pankassi.accesscore.dto.request.LoginRequest;
 import com.pankassi.accesscore.dto.response.AuthenticationResponse;
 import lombok.extern.slf4j.Slf4j;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -77,19 +76,16 @@ public class AuthenticationService {
     }
 
 
-    @Transactional(readOnly = true)
+    @Transactional
     public AuthenticationResponse login(LoginRequest request) {
         // 1. Trouver le client
-        Client client = clientRepository.findByEmail(request.email())
+        Client client = clientRepository.findByEmailWithRolesAndResources(request.email())
                 .orElseThrow(() -> new IllegalArgumentException("Invalid email or password"));
 
         // 2. Vérifier le mot de passe
         if (!passwordEncoder.matches(request.password(), client.getPassword())) {
             throw new IllegalArgumentException("Invalid email or password");
         }
-
-        // Ensure role resources are initialized before JWT generation (prevents LazyInitializationException).
-        client.getRoleSet().forEach(role -> Hibernate.initialize(role.getResourceSet()));
 
         // 3. Générer l'Access Token
         String accessToken = jwtService.generateToken(client);
