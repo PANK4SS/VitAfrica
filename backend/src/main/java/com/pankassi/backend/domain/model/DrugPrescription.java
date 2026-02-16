@@ -28,7 +28,7 @@ public class DrugPrescription {
     @Column(nullable = false)
     private Integer durationDays;      // ex: 5
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "prescription_id", nullable = false)
     private MedicalPrescription prescription;
 }

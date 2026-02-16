@@ -34,7 +34,7 @@ public class VitalSign {
     @Column(name = "date_measured", nullable = false)
     private LocalDateTime dateMeasured;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "patientId", nullable = false)
     private Patient patient;
 }

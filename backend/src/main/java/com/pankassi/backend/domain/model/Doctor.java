@@ -25,7 +25,7 @@ public class Doctor {
     private String department;
 
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "clientId", unique = true, nullable = false)
     private Client client;
 

@@ -24,7 +24,7 @@ public class UserProfile {
     @Column(nullable = false)
     private RequestStatus status = RequestStatus.PENDING;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "clientId", unique = true, nullable = false)
     private Client client;
 }

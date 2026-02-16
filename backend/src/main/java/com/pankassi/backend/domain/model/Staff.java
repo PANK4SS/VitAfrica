@@ -17,7 +17,7 @@ public class Staff {
     @Column(name = "staff_id")
     private Long staffId;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "clientId", unique = true, nullable = false)
     private Client client;
 }
