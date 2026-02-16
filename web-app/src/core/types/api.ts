@@ -48,8 +48,9 @@ export interface PersonnelResponse {
 }
 
 export interface DepartmentResponse {
-  id: number;
+  departmentId: number;
   name: string;
+  doctorCount: number;
 }
 
 export interface StaffDashboardResponse {
@@ -92,7 +93,6 @@ export interface ConsultationSummaryResponse {
 
 export interface ConsultationDetailResponse {
   appointmentId: number;
-  patientId: number;
   patientName: string;
   patientPhone: string;
   patientLocation: string;
@@ -103,8 +103,10 @@ export interface ConsultationDetailResponse {
 }
 
 export interface DrugRequest {
-  drugId: number;
-  quantity: number;
+  drugName: string;
+  dosage: string;
+  frequency: string;
+  durationDays: number;
 }
 
 export interface AddPrescriptionPayload {

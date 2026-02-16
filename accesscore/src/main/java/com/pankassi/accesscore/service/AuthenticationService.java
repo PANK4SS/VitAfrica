@@ -8,17 +8,17 @@ import com.pankassi.accesscore.domain.repository.RoleRepository;
 import com.pankassi.accesscore.dto.request.ClientRequest;
 import com.pankassi.accesscore.dto.request.LoginRequest;
 import com.pankassi.accesscore.dto.response.AuthenticationResponse;
+import lombok.extern.slf4j.Slf4j;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
 import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AuthenticationService {
     private final ClientRepository clientRepository;
     private final RoleRepository roleRepository;
@@ -88,13 +88,19 @@ public class AuthenticationService {
         // 3. Générer l'Access Token
         String accessToken = jwtService.generateToken(client);
 
-        // 4. Générer le Refresh Token
-        RefreshToken refreshToken = refreshTokenService.createRefreshToken(client);
+        // 4. Générer le Refresh Token (fallback safe: login should not crash if this fails)
+        String refreshTokenValue = "";
+        try {
+            RefreshToken refreshToken = refreshTokenService.createRefreshToken(client);
+            refreshTokenValue = refreshToken.getToken();
+        } catch (Exception ex) {
+            log.error("Refresh token creation failed for client {}", client.getEmail(), ex);
+        }
 
-        // 5. Construire la réponse (CORRECTION ICI : utiliser le constructeur standard)
+        // 5. Construire la réponse
         return new AuthenticationResponse(
                 accessToken,
-                refreshToken.getToken(),
+                refreshTokenValue,
                 client.getEmail(),
                 client.getClientName()
         );

@@ -1,6 +1,9 @@
 import type { ApiError } from '../types/domain';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8080';
+const DEFAULT_API_BASE_URL = 'https://vitafrica-production.up.railway.app';
+const API_BASE_URL = (
+  import.meta.env.VITE_API_BASE_URL ?? DEFAULT_API_BASE_URL
+).replace(/\/+$/, '');
 
 type HttpMethod = 'GET' | 'POST' | 'PATCH' | 'DELETE';
 
@@ -43,8 +46,14 @@ export async function httpRequest<T>(
     let message = fallbackMessage;
 
     try {
-      const text = await response.text();
-      message = text || fallbackMessage;
+      const contentType = response.headers.get('content-type') ?? '';
+      if (contentType.includes('application/json')) {
+        const data = (await response.json()) as { message?: string; error?: string };
+        message = data.message || data.error || fallbackMessage;
+      } else {
+        const text = await response.text();
+        message = text || fallbackMessage;
+      }
     } catch {
       message = fallbackMessage;
     }

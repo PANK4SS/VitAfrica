@@ -119,7 +119,7 @@ export function AdminPage() {
     if (!session) return;
     try {
       await adminApi.deleteDepartment(session.accessToken, id);
-      setDepartments(prev => prev.filter(d => d.id !== id));
+      setDepartments(prev => prev.filter(d => d.departmentId !== id));
     } catch {
       setError('Cannot delete department with active staff');
     }
@@ -222,7 +222,7 @@ export function AdminPage() {
                   </thead>
                   <tbody>
                     {departments.slice(0, 5).map(dept => (
-                      <tr key={dept.id}>
+                      <tr key={dept.departmentId}>
                         <td style={{ fontWeight: 600 }}>{dept.name}</td>
                         <td><span className="badge badge--approved">Active</span></td>
                       </tr>
@@ -296,7 +296,7 @@ export function AdminPage() {
                   <label className="form-label">Clinical Department</label>
                   <select className="input-style" value={approvalDept} onChange={e => setApprovalDept(e.target.value)}>
                     {departments.map(d => (
-                      <option key={d.id} value={d.name}>{d.name}</option>
+                      <option key={d.departmentId} value={d.name}>{d.name}</option>
                     ))}
                   </select>
                 </div>
@@ -380,11 +380,11 @@ export function AdminPage() {
                 </thead>
                 <tbody>
                   {departments.map(dept => (
-                    <tr key={dept.id}>
+                    <tr key={dept.departmentId}>
                       <td style={{ fontWeight: 600 }}>{dept.name}</td>
-                      <td>Standard Ward</td>
+                      <td>{dept.doctorCount} doctor(s)</td>
                       <td>
-                        <button className="btn btn--ghost" style={{ color: 'var(--danger)', padding: '0.5rem' }} onClick={() => deleteDept(dept.id)}>
+                        <button className="btn btn--ghost" style={{ color: 'var(--danger)', padding: '0.5rem' }} onClick={() => deleteDept(dept.departmentId)}>
                           <Trash2 size={18} />
                         </button>
                       </td>

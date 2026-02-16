@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Users,
   CalendarPlus,
@@ -88,8 +88,6 @@ export function StaffPage() {
       setError('Could not schedule appointment. Verify IDs.');
     }
   };
-
-  const patientCount = useMemo(() => patients.length, [patients]);
 
   if (loading) {
     return (

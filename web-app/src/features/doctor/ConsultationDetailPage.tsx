@@ -27,9 +27,10 @@ export function ConsultationDetailPage({ appointmentId }: ConsultationDetailPage
   const { session } = useAuth();
 
   const [detail, setDetail] = useState<ConsultationDetailResponse | null>(null);
-  const [patientId, setPatientId] = useState('');
-  const [drugId, setDrugId] = useState('');
-  const [quantity, setQuantity] = useState('1');
+  const [drugName, setDrugName] = useState('');
+  const [dosage, setDosage] = useState('');
+  const [frequency, setFrequency] = useState('');
+  const [durationDays, setDurationDays] = useState('1');
   const [file, setFile] = useState<File | null>(null);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
@@ -44,7 +45,6 @@ export function ConsultationDetailPage({ appointmentId }: ConsultationDetailPage
       try {
         const data = await doctorApi.getConsultationDetail(token, appointmentId);
         setDetail(data);
-        if (data && data.patientId) setPatientId(String(data.patientId));
       } catch (err) {
         setError('Clinical file could not be retrieved.');
       } finally {
@@ -62,13 +62,22 @@ export function ConsultationDetailPage({ appointmentId }: ConsultationDetailPage
 
     try {
       await doctorApi.addPrescription(token, appointmentId, {
-        patientId: Number(patientId),
-        drugs: [{ drugId: Number(drugId), quantity: Number(quantity) }],
+        patientId: appointmentId,
+        drugs: [
+          {
+            drugName,
+            dosage,
+            frequency,
+            durationDays: Number(durationDays),
+          },
+        ],
       });
       setMessage('Prescription successfully registered.');
       setTimeout(() => setMessage(''), 3000);
-      setDrugId('');
-      setQuantity('1');
+      setDrugName('');
+      setDosage('');
+      setFrequency('');
+      setDurationDays('1');
     } catch (err) {
       setError('Prescription error.');
     }
@@ -191,15 +200,48 @@ export function ConsultationDetailPage({ appointmentId }: ConsultationDetailPage
             </div>
             <div style={{ padding: '1.5rem' }}>
               <form onSubmit={addPrescription} style={{ display: 'grid', gap: '1rem' }}>
+                <div className="form-group">
+                  <label className="form-label">Drug Name</label>
+                  <input
+                    className="input-style"
+                    placeholder="e.g. Paracetamol 500mg"
+                    value={drugName}
+                    onChange={(e) => setDrugName(e.target.value)}
+                    required
+                  />
+                </div>
                 <div className="grid-2">
                   <div className="form-group">
-                    <label className="form-label">Drug ID</label>
-                    <input className="input-style" placeholder="e.g. 201" value={drugId} onChange={(e) => setDrugId(e.target.value)} required />
+                    <label className="form-label">Dosage</label>
+                    <input
+                      className="input-style"
+                      placeholder="e.g. 1 tablet"
+                      value={dosage}
+                      onChange={(e) => setDosage(e.target.value)}
+                      required
+                    />
                   </div>
                   <div className="form-group">
-                    <label className="form-label">Quantity</label>
-                    <input className="input-style" type="number" min="1" value={quantity} onChange={(e) => setQuantity(e.target.value)} required />
+                    <label className="form-label">Frequency</label>
+                    <input
+                      className="input-style"
+                      placeholder="e.g. 2 times/day"
+                      value={frequency}
+                      onChange={(e) => setFrequency(e.target.value)}
+                      required
+                    />
                   </div>
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Duration (days)</label>
+                  <input
+                    className="input-style"
+                    type="number"
+                    min="1"
+                    value={durationDays}
+                    onChange={(e) => setDurationDays(e.target.value)}
+                    required
+                  />
                 </div>
                 <button className="btn btn--secondary" type="submit" style={{ width: '100%' }}>
                   <FileText size={18} />

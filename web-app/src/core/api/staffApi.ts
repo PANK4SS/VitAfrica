@@ -11,8 +11,9 @@ export const staffApi = {
     return httpRequest('/api/staff/dashboard', { token });
   },
 
-  getPatients(token: string): Promise<PatientSummaryResponse[]> {
-    return httpRequest('/api/staff/patients', { token });
+  getPatients(token: string, search?: string): Promise<PatientSummaryResponse[]> {
+    const query = search?.trim() ? `?search=${encodeURIComponent(search.trim())}` : '';
+    return httpRequest(`/api/staff/patients${query}`, { token });
   },
 
   getDoctors(token: string): Promise<DoctorSummaryResponse[]> {

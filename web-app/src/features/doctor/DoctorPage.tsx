@@ -51,8 +51,8 @@ export function DoctorPage() {
     void load();
   }, [session]);
 
-  const ongoingConsultations = consultations.filter(c => c.status === 'PENDING');
-  const finishedConsultations = consultations.filter(c => c.status !== 'PENDING');
+  const ongoingConsultations = consultations.filter(c => c.status !== 'COMPLETED');
+  const finishedConsultations = consultations.filter(c => c.status === 'COMPLETED');
 
   if (loading) {
     return (
@@ -184,10 +184,10 @@ export function DoctorPage() {
                     </td>
                     <td>
                       <button
-                        className={`btn ${c.status === 'PENDING' ? 'btn--secondary' : 'btn--ghost'}`}
+                        className={`btn ${c.status !== 'COMPLETED' ? 'btn--secondary' : 'btn--ghost'}`}
                         onClick={() => navigateTo(`/app/doctor/consultations/${c.appointmentId}`)}
                       >
-                        {c.status === 'PENDING' ? 'Open Case' : 'View File'}
+                        {c.status !== 'COMPLETED' ? 'Open Case' : 'View File'}
                         <ExternalLink size={14} style={{ marginLeft: '4px' }} />
                       </button>
                     </td>
