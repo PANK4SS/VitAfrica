@@ -17,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.pankassi.accesscore.domain.repository.ClientRepository;
 
@@ -68,6 +69,7 @@ public class PatientService {
     }
 
     // Méthode privée utilitaire — à réutiliser dans toutes les méthodes du service
+    @Transactional(readOnly = true)
     private Patient getAuthenticatedPatient() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
@@ -82,6 +84,7 @@ public class PatientService {
                 .orElseThrow(() -> new IllegalArgumentException("Patient profile not found"));
     }
 
+    @Transactional(readOnly = true)
     public MobileHomeResponse getMobileHomeInfo(){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
@@ -159,6 +162,7 @@ public class PatientService {
     }
 
 
+    @Transactional(readOnly = true)
     public List<AppointmentResponse> getPatientAppointments() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
@@ -196,6 +200,7 @@ public class PatientService {
     }
 
 
+    @Transactional(readOnly = true)
     public List<PrescriptionResponse> getPatientPrescriptions() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
@@ -234,6 +239,7 @@ public class PatientService {
 
 
     // ===== LAB RESULTS =====
+    @Transactional(readOnly = true)
     public List<LabResultResponse> getPatientLabResults() {
         Patient patient = getAuthenticatedPatient();
 
@@ -251,6 +257,7 @@ public class PatientService {
     }
 
     // ===== PROFILE =====
+    @Transactional(readOnly = true)
     public PatientProfileResponse getPatientProfile() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String email = authentication.getName();

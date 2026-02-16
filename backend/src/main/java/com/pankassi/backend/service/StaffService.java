@@ -24,11 +24,13 @@ public class StaffService {
     private final AppointmentRepository appointmentRepository;
 
     // ===== DASHBOARD =====
+    @Transactional(readOnly = true)
     public StaffDashboardResponse getDashboard() {
         return new StaffDashboardResponse(patientRepository.count());
     }
 
     // ===== PATIENTS =====
+    @Transactional(readOnly = true)
     public List<PatientSummaryResponse> getPatients(String search) {
         List<Patient> patients = (search != null && !search.isBlank())
                 ? patientRepository.searchByNameOrPhone(search)
@@ -46,6 +48,7 @@ public class StaffService {
     }
 
     // ===== DOCTORS — pour le form appointment =====
+    @Transactional(readOnly = true)
     public List<DoctorSummaryResponse> getDoctors() {
         return doctorRepository.findAllByOrderByDepartmentAsc()
                 .stream()

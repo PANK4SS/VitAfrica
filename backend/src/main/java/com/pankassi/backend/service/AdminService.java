@@ -30,6 +30,7 @@ public class AdminService {
     private final RoleRepository roleRepository;
 
     // ================= DASHBOARD =================
+    @Transactional(readOnly = true)
     public AdminDashboardResponse usersStats() {
         return new AdminDashboardResponse(
                 (int) patientRepository.count(),
@@ -41,6 +42,7 @@ public class AdminService {
 
     // ================= PENDING REQUESTS =================
 
+    @Transactional(readOnly = true)
     public List<PendingRequestResponse> getPendingRequests() {
         return userProfileRepository.findAllByStatus(RequestStatus.PENDING)
                 .stream()
@@ -122,6 +124,7 @@ public class AdminService {
 
     // ================= PERSONNEL LIST =================
 
+    @Transactional(readOnly = true)
     public List<PersonnelResponse> getPersonnel(String roleFilter, String search) {
         RequestStatus statusFilter = RequestStatus.APPROVED; // on affiche que les approuvés
 
@@ -159,6 +162,7 @@ public class AdminService {
 
     // ================= DEPARTMENTS =================
 
+    @Transactional(readOnly = true)
     public List<DepartmentResponse> getDepartments() {
         return departmentRepository.findAll()
                 .stream()

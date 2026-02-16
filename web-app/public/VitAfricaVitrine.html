@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VitAfrica - Digital Healthcare Management</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Custom color setup -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#04045e',
+                        secondary: '#b9fa3c',
+                        light: '#f3f4f6',
+                        dark: '#111827',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 antialiased">
+
+    <!-- NAVIGATION -->
+    <nav class="fixed w-full z-50 bg-white/90 backdrop-blur-md shadow-sm transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <!-- Logo -->
+                <div class="flex-shrink-0 flex items-center gap-2 cursor-pointer" onclick="window.scrollTo(0,0)">
+                    <img src="/app_logo.svg" alt="VitAfrica Official Logo" class="w-10 h-10 object-contain">
+                    <span class="font-bold text-2xl text-primary">VitAfrica</span>
+                </div>
+
+                <!-- Desktop Menu -->
+                <div class="hidden md:flex space-x-8 items-center">
+                    <a href="#vision" class="text-gray-600 hover:text-primary transition font-medium">Vision</a>
+                    <a href="#cliniques" class="text-gray-600 hover:text-primary transition font-medium">For Clinics</a>
+                    <a href="#roles" class="text-gray-600 hover:text-primary transition font-medium">Roles</a>
+                    <a href="#patients" class="text-gray-600 hover:text-primary transition font-medium">For Patients</a>
+                    <a href="/#/login" target="_parent" class="border-2 border-primary text-primary px-5 py-2 rounded-full font-semibold hover:bg-primary hover:text-white transition">Web Login</a>
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <div class="md:hidden flex items-center">
+                    <button id="mobile-menu-btn" class="text-primary hover:text-gray-600 focus:outline-none">
+                        <i class="fas fa-bars text-2xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Menu Panel -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-gray-100">
+            <div class="px-4 pt-2 pb-4 space-y-2">
+                <a href="#vision" class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-primary hover:bg-gray-50 rounded-md">Vision</a>
+                <a href="#cliniques" class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-primary hover:bg-gray-50 rounded-md">For Clinics</a>
+                <a href="#roles" class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-primary hover:bg-gray-50 rounded-md">Roles</a>
+                <a href="#patients" class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-primary hover:bg-gray-50 rounded-md">For Patients</a>
+                <a href="/#/login" target="_parent" class="block px-3 py-2 text-base font-bold text-primary hover:bg-gray-50 rounded-md">Open Web App</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- HERO SECTION -->
+    <header class="relative bg-primary pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden">
+        <!-- Decoration circles -->
+        <div class="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 rounded-full bg-secondary opacity-10 blur-3xl"></div>
+        <div class="absolute bottom-0 left-0 -ml-20 -mb-20 w-72 h-72 rounded-full bg-blue-500 opacity-20 blur-3xl"></div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <!-- Text Content -->
+                <div class="text-center lg:text-left">
+                    <div class="inline-block px-4 py-1 mb-4 rounded-full bg-white/10 text-secondary text-sm font-semibold tracking-wide border border-secondary/30">
+                        SaaS Hospital Management System
+                    </div>
+                    <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight mb-6">
+                        Digital healthcare, <br>
+                        <span class="text-secondary">built for Africa.</span>
+                    </h1>
+                    <p class="text-lg text-gray-300 mb-8 max-w-lg mx-auto lg:mx-0">
+                        Replace paper records with a centralized, secure and reliable platform. Simplify medical workflows and improve patient follow-up.
+                    </p>
+                    
+                    <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+                        <a href="/#/login" target="_parent" class="px-8 py-4 bg-secondary text-primary font-bold rounded-lg shadow-[0_0_20px_rgba(185,250,60,0.4)] hover:shadow-[0_0_30px_rgba(185,250,60,0.6)] hover:scale-105 transition transform flex items-center justify-center gap-2">
+                            <i class="fas fa-desktop"></i> Web Application
+                        </a>
+                        <a href="#" class="px-8 py-4 border border-white text-white font-semibold rounded-lg hover:bg-white hover:text-primary transition flex items-center justify-center gap-2">
+                            <i class="fab fa-android"></i> Download APK
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Image -->
+                <div class="relative">
+                    <img src="https://images.unsplash.com/photo-1631217868264-e5b90bb7e133?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" 
+                         alt="African doctor using a tablet" 
+                         class="rounded-2xl shadow-2xl border-4 border-white/10 relative z-10 w-full object-cover h-[400px] lg:h-[500px]">
+                    
+                    <!-- Floating Card -->
+                    <div class="absolute -bottom-6 -left-6 bg-white p-4 rounded-xl shadow-lg z-20 flex items-center gap-3 animate-bounce" style="animation-duration: 3s;">
+                        <div class="bg-green-100 p-2 rounded-full text-green-600">
+                            <i class="fas fa-check-circle text-xl"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs text-gray-500">Status</p>
+                            <p class="font-bold text-primary">Centralized Record</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- VISION / PROBLEME -->
+    <section id="vision" class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl font-bold text-primary mb-4">Why VitAfrica?</h2>
+                <p class="text-gray-600 max-w-2xl mx-auto">
+                    We understand the daily challenges of clinics and medical centers. VitAfrica provides a practical response to operational pain points.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Item 1 -->
+                <div class="bg-gray-50 p-8 rounded-2xl hover:shadow-lg transition duration-300 border border-gray-100">
+                    <div class="w-14 h-14 bg-red-100 text-red-500 rounded-full flex items-center justify-center text-2xl mb-6">
+                        <i class="fas fa-file-excel"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-3">Paperless Operations</h3>
+                    <p class="text-gray-600">No more lost files, unreadable notes or duplicate records. Everything is stored digitally.</p>
+                </div>
+
+                <!-- Item 2 -->
+                <div class="bg-gray-50 p-8 rounded-2xl hover:shadow-lg transition duration-300 border border-gray-100">
+                    <div class="w-14 h-14 bg-blue-100 text-primary rounded-full flex items-center justify-center text-2xl mb-6">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-3">Secured Data</h3>
+                    <p class="text-gray-600">Medical data is centralized and protected. Access is controlled by role (Administrator, Doctor, Staff).</p>
+                </div>
+
+                <!-- Item 3 -->
+                <div class="bg-gray-50 p-8 rounded-2xl hover:shadow-lg transition duration-300 border border-gray-100">
+                    <div class="w-14 h-14 bg-secondary/30 text-green-700 rounded-full flex items-center justify-center text-2xl mb-6">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-3">Optimized Operations</h3>
+                    <p class="text-gray-600">From pharmacy to billing and appointments, manage your clinic with a 360-degree view.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- WEB APP FEATURES (CLINICS) -->
+    <section id="cliniques" class="py-20 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="lg:flex lg:items-center lg:gap-16">
+                <!-- Image Section -->
+                <div class="lg:w-1/2 mb-12 lg:mb-0">
+                    <div class="relative rounded-2xl overflow-hidden shadow-2xl">
+                        <img src="https://images.unsplash.com/photo-1579684385127-1ef15d508118?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" 
+                             alt="African medical team" class="w-full h-full object-cover">
+                        <div class="absolute inset-0 bg-primary/20"></div>
+                    </div>
+                </div>
+
+                <!-- Content Section -->
+                <div class="lg:w-1/2">
+                    <span class="text-secondary font-bold tracking-wider uppercase text-sm">For Administration & Doctors</span>
+                    <h2 class="text-3xl md:text-4xl font-bold text-primary mt-2 mb-6">A Complete Web Platform</h2>
+                    <p class="text-gray-600 mb-8">
+                        VitAfrica is powered by a web platform designed to run daily operations without unnecessary complexity.
+                    </p>
+
+                    <div class="space-y-6">
+                        <!-- Feature -->
+                        <div class="flex gap-4">
+                            <div class="flex-shrink-0 w-12 h-12 rounded-lg bg-white shadow-sm flex items-center justify-center text-primary text-xl">
+                                <i class="fas fa-user-injured"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-gray-900">Patient Records & History</h4>
+                                <p class="text-sm text-gray-500">Complete follow-up of consultations, prescriptions and history.</p>
+                            </div>
+                        </div>
+                        <!-- Feature -->
+                        <div class="flex gap-4">
+                            <div class="flex-shrink-0 w-12 h-12 rounded-lg bg-white shadow-sm flex items-center justify-center text-primary text-xl">
+                                <i class="fas fa-calendar-check"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-gray-900">Appointment Management</h4>
+                                <p class="text-sm text-gray-500">Intuitive scheduling for front desk teams and doctors.</p>
+                            </div>
+                        </div>
+                        <!-- Feature -->
+                        <div class="flex gap-4">
+                            <div class="flex-shrink-0 w-12 h-12 rounded-lg bg-white shadow-sm flex items-center justify-center text-primary text-xl">
+                                <i class="fas fa-pills"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-gray-900">Pharmacy & Billing</h4>
+                                <p class="text-sm text-gray-500">Real-time stock monitoring and automated invoicing.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-10">
+                        <a href="/#/login" target="_parent" class="inline-block bg-primary text-white font-semibold px-6 py-3 rounded-lg hover:bg-opacity-90 transition">
+                            Access Pro Workspace
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Roles Utilisateurs -->
+    <section id="roles" class="py-20 bg-primary text-white relative overflow-hidden">
+        <!-- Background Pattern -->
+        <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(#b9fa3c 1px, transparent 1px); background-size: 30px 30px;"></div>
+        
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl font-bold mb-4">A platform for everyone</h2>
+                <p class="text-gray-300 max-w-2xl mx-auto">Whether you are an administrator, doctor or patient, VitAfrica adapts to your workflow.</p>
+            </div>
+
+            <div class="grid md:grid-cols-4 gap-6">
+                <!-- Admin -->
+                <div class="bg-white/10 backdrop-blur-md p-6 rounded-xl border border-white/10 hover:border-secondary transition-colors duration-300">
+                    <img src="https://images.unsplash.com/photo-1531123414780-f74242c2b052?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&q=80" alt="Admin" class="w-16 h-16 rounded-full border-2 border-secondary mb-4 object-cover mx-auto">
+                    <h3 class="text-xl font-bold text-center mb-2">Administrator</h3>
+                    <p class="text-sm text-gray-300 text-center">Global management, dashboards, financial tracking and configuration.</p>
+                </div>
+
+                <!-- Medecin -->
+                <div class="bg-white/10 backdrop-blur-md p-6 rounded-xl border border-white/10 hover:border-secondary transition-colors duration-300">
+                    <img src="https://images.unsplash.com/photo-1622253692010-333f2da6031d?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&q=80" alt="Doctor" class="w-16 h-16 rounded-full border-2 border-secondary mb-4 object-cover mx-auto">
+                    <h3 class="text-xl font-bold text-center mb-2">Doctor</h3>
+                    <p class="text-sm text-gray-300 text-center">Consultation, medical notes, diagnosis, prescriptions and results.</p>
+                </div>
+
+                <!-- Staff -->
+                <div class="bg-white/10 backdrop-blur-md p-6 rounded-xl border border-white/10 hover:border-secondary transition-colors duration-300">
+                    <img src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&q=80" alt="Staff" class="w-16 h-16 rounded-full border-2 border-secondary mb-4 object-cover mx-auto">
+                    <h3 class="text-xl font-bold text-center mb-2">Staff</h3>
+                    <p class="text-sm text-gray-300 text-center">Front desk, appointment planning, billing and patient intake.</p>
+                </div>
+
+                <!-- Patient -->
+                <div class="bg-white/10 backdrop-blur-md p-6 rounded-xl border border-white/10 hover:border-secondary transition-colors duration-300">
+                    <img src="https://images.unsplash.com/photo-1542596594-649edbc13630?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&q=80" alt="Patient" class="w-16 h-16 rounded-full border-2 border-secondary mb-4 object-cover mx-auto">
+                    <h3 class="text-xl font-bold text-center mb-2">Patient</h3>
+                    <p class="text-sm text-gray-300 text-center">Access to personal records, prescription history and lab results.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- MOBILE APP SECTION (PATIENTS) -->
+    <section id="patients" class="py-20 bg-white text-gray-800 overflow-hidden relative border-t border-gray-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                
+                <div class="order-2 lg:order-1">
+                    <span class="text-secondary font-bold tracking-wider uppercase text-sm bg-primary px-3 py-1 rounded-full">Application Mobile</span>
+                    <h2 class="text-3xl md:text-4xl font-bold text-primary mt-4 mb-6">The Patient App</h2>
+                    <p class="text-gray-600 text-lg mb-8">
+                        Give patients direct access to their health journey from their phone. Simple, lightweight and accessible.
+                    </p>
+
+                    <ul class="space-y-4 mb-10">
+                        <li class="flex items-center gap-3">
+                            <div class="w-6 h-6 rounded-full bg-secondary/20 flex items-center justify-center text-primary text-xs">
+                                <i class="fas fa-check"></i>
+                            </div>
+                            <span class="text-gray-700">Consultation and appointment history</span>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <div class="w-6 h-6 rounded-full bg-secondary/20 flex items-center justify-center text-primary text-xs">
+                                <i class="fas fa-check"></i>
+                            </div>
+                            <span class="text-gray-700">Access to medical prescriptions</span>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <div class="w-6 h-6 rounded-full bg-secondary/20 flex items-center justify-center text-primary text-xs">
+                                <i class="fas fa-check"></i>
+                            </div>
+                            <span class="text-gray-700">Download laboratory results</span>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <div class="w-6 h-6 rounded-full bg-secondary/20 flex items-center justify-center text-primary text-xs">
+                                <i class="fas fa-check"></i>
+                            </div>
+                            <span class="text-gray-700">Secure login with phone number</span>
+                        </li>
+                    </ul>
+
+                    <a href="#" class="inline-flex items-center bg-primary text-white font-bold px-8 py-4 rounded-xl hover:bg-opacity-90 transition duration-300 shadow-xl">
+                        <i class="fab fa-android text-2xl mr-3 text-secondary"></i>
+                        <div class="text-left">
+                            <span class="block text-xs uppercase font-semibold text-gray-300">Available now</span>
+                            <span class="block text-lg leading-none">Download APK</span>
+                        </div>
+                    </a>
+                </div>
+
+                <div class="order-1 lg:order-2 flex justify-center">
+                    <!-- Mockup Phone -->
+                    <div class="relative w-72 h-[550px] bg-gray-900 rounded-[3rem] border-8 border-gray-800 shadow-2xl overflow-hidden transform hover:scale-105 transition duration-500">
+                        <div class="absolute top-0 w-full h-8 bg-gray-800 rounded-b-xl z-20"></div>
+                        <!-- Screen Image -->
+                        <img src="https://images.unsplash.com/photo-1530497610245-94d3c16cda28?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" 
+                             alt="Mobile App Interface" class="w-full h-full object-cover opacity-80">
+                        
+                        <!-- UI Overlay Simulation -->
+                        <div class="absolute inset-0 flex flex-col justify-end p-6 bg-gradient-to-t from-primary/90 to-transparent">
+                            <div class="bg-white/10 backdrop-blur-md p-4 rounded-xl border border-white/20 mb-4">
+                                <p class="text-xs text-secondary font-bold mb-1">NEXT APPOINTMENT</p>
+                                <p class="text-white font-semibold">Dr. Ouedraogo</p>
+                                <p class="text-gray-300 text-sm">Cardiology - 14:00</p>
+                            </div>
+                            <div class="bg-white/10 backdrop-blur-md p-4 rounded-xl border border-white/20">
+                                <p class="text-xs text-secondary font-bold mb-1">RESULTS</p>
+                                <p class="text-white font-semibold">Blood test</p>
+                                <p class="text-gray-300 text-sm">Available as PDF</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="bg-dark text-gray-400 py-12 border-t border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+                <div class="col-span-1 md:col-span-2">
+                    <div class="flex items-center gap-2 mb-4">
+                        <img src="/app_logo.svg" alt="VitAfrica Official Logo" class="w-8 h-8 object-contain">
+                        <span class="font-bold text-xl text-white">VitAfrica</span>
+                    </div>
+                    <p class="text-sm max-w-xs">
+                        Digitalizing healthcare in Africa with a practical and reliable solution.
+                    </p>
+                </div>
+                
+                <div>
+                    <h4 class="text-white font-bold mb-4">Quick Links</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#vision" class="hover:text-secondary transition">Vision</a></li>
+                        <li><a href="#cliniques" class="hover:text-secondary transition">For Clinics</a></li>
+                        <li><a href="#roles" class="hover:text-secondary transition">Roles</a></li>
+                        <li><a href="#patients" class="hover:text-secondary transition">For Patients</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="text-white font-bold mb-4">Contact</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li class="flex items-center"><i class="fas fa-envelope mr-2 text-secondary"></i> contact@vitafrica.com</li>
+                        <li class="flex items-center"><i class="fas fa-map-marker-alt mr-2 text-secondary"></i> Ouagadougou, Burkina Faso</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center text-xs">
+                <p>&copy; 2026 VitAfrica. All rights reserved.</p>
+                <p>MVP Version 1.0</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts for basic interactivity -->
+    <script>
+        // Menu Mobile
+        const btn = document.getElementById('mobile-menu-btn');
+        const menu = document.getElementById('mobile-menu');
+
+        btn.addEventListener('click', () => {
+            menu.classList.toggle('hidden');
+        });
+
+        // Close menu when a link is clicked
+        menu.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                menu.classList.add('hidden');
+            });
+        });
+    </script>
+</body>
+</html>

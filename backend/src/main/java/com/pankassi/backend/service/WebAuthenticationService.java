@@ -49,6 +49,7 @@ public class WebAuthenticationService {
     }
 
     //Login Patient
+    @Transactional
     public AuthenticationResponse loginPatient(LoginRequest loginRequest){
         return accessCoreAuthService.login(loginRequest);
     }

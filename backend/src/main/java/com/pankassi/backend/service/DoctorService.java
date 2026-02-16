@@ -45,6 +45,7 @@ public class DoctorService {
     }
 
     // ===== DASHBOARD =====
+    @Transactional(readOnly = true)
     public DoctorDashboardResponse getDashboard() {
         Doctor doctor = getAuthenticatedDoctor();
         return new DoctorDashboardResponse(
@@ -54,6 +55,7 @@ public class DoctorService {
     }
 
     // ===== CONSULTATIONS LIST =====
+    @Transactional(readOnly = true)
     public List<ConsultationSummaryResponse> getConsultations() {
         Doctor doctor = getAuthenticatedDoctor();
 
@@ -72,6 +74,7 @@ public class DoctorService {
     }
 
     // ===== CONSULTATION DETAIL =====
+    @Transactional(readOnly = true)
     public ConsultationDetailResponse getConsultationDetail(Long appointmentId) {
         Doctor doctor = getAuthenticatedDoctor();
 
