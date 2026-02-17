@@ -1,4 +1,4 @@
-# application_mobile
+# VitAfrica
 
 A new Flutter project.
 
