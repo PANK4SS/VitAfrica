@@ -19,6 +19,22 @@ import { StatCard } from '../../shared/components/StatCard';
 import { StatusPill } from '../../shared/components/StatusPill';
 import { WelcomeBanner } from '../../shared/components/WelcomeBanner';
 
+type ConsultationSummaryApiVariant = ConsultationSummaryResponse & {
+  patientProfilePicUrl?: string | null;
+  profilePicUrl?: string | null;
+};
+
+function normalizePatientProfilePic(consultation: ConsultationSummaryApiVariant): ConsultationSummaryResponse {
+  return {
+    ...consultation,
+    patientProfilePic:
+      consultation.patientProfilePic ??
+      consultation.patientProfilePicUrl ??
+      consultation.profilePicUrl ??
+      null,
+  };
+}
+
 export function DoctorPage() {
   const { session } = useAuth();
   const path = useHashPath();
@@ -43,7 +59,11 @@ export function DoctorPage() {
           doctorApi.getConsultations(token).catch(() => []),
         ]);
         if (dashData) setDashboard(dashData);
-        setConsultations(consultationsData);
+        setConsultations(
+          consultationsData.map((consultation) =>
+            normalizePatientProfilePic(consultation as ConsultationSummaryApiVariant),
+          ),
+        );
       } catch (err) {
         setError('Unable to fetch clinical schedules.');
       } finally {
@@ -131,8 +151,7 @@ export function DoctorPage() {
                     {ongoingConsultations.slice(0, 3).map(c => (
                       <tr key={c.appointmentId}>
                         <td>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                            <ProfileAvatar src={c.patientProfilePic} alt={c.patientName} size={36} />
+                          <div>
                             <div>
                               <div style={{ fontWeight: 600, color: 'var(--primary)' }}>{c.patientName}</div>
                               <div className="muted" style={{ fontSize: '0.75rem' }}>{c.hour} - Consultation</div>
@@ -230,8 +249,7 @@ export function DoctorPage() {
                 {filteredConsultations.map(c => (
                   <tr key={c.appointmentId}>
                     <td>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                        <ProfileAvatar src={c.patientProfilePic} alt={c.patientName} size={36} />
+                      <div>
                         <div style={{ fontWeight: 600, color: 'var(--primary)' }}>{c.patientName}</div>
                       </div>
                     </td>
