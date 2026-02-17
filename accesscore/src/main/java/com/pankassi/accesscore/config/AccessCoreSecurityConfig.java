@@ -62,7 +62,8 @@ public class AccessCoreSecurityConfig {
     public SecurityFilterChain accessCoreFilterChain(HttpSecurity http) throws Exception {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(List.of(
-                "http://localhost:5173",
+                "http://localhost:*",
+                "https://*.vercel.app",
                 "https://vitafrica-production.up.railway.app"
         ));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
