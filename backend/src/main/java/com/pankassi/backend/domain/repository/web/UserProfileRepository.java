@@ -18,6 +18,8 @@ public interface UserProfileRepository extends JpaRepository<UserProfile,Long> {
 
     Optional<UserProfile> findByClientClientId(Long clientId);
 
+    Optional<UserProfile> findByClient(Client client);
+
     //Search by client name
     @Query("SELECT up FROM UserProfile up WHERE " +
             "LOWER(up.client.clientName) LIKE LOWER(CONCAT('%', :search, '%'))")
