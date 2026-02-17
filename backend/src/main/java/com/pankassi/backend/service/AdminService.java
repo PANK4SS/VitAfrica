@@ -160,6 +160,22 @@ public class AdminService {
                 .toList();
     }
 
+    @Transactional
+    public void deletePersonnel(Long clientId) {
+        Client client = clientRepository.findById(clientId)
+                .orElseThrow(() -> new IllegalArgumentException("Client not found"));
+
+        // Supprimer le profil métier selon le rôle
+        doctorRepository.findByClient(client).ifPresent(doctorRepository::delete);
+        staffRepository.findByClient(client).ifPresent(staffRepository::delete);
+
+        // Supprimer le UserProfile
+        userProfileRepository.findByClient(client).ifPresent(userProfileRepository::delete);
+
+        // Supprimer le Client (cascade devrait gérer les relations)
+        clientRepository.delete(client);
+    }
+
     // ================= DEPARTMENTS =================
 
     @Transactional(readOnly = true)

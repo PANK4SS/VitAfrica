@@ -68,4 +68,11 @@ export const adminApi = {
       token,
     });
   },
+
+  deletePersonnel(token: string, clientId: number): Promise<void> {
+    return httpRequest(`/api/admin/personnel/${clientId}`, {
+      method: 'DELETE',
+      token,
+    });
+  },
 };

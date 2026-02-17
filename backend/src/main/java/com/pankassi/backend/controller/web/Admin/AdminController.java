@@ -56,6 +56,12 @@ public class AdminController {
         return ResponseEntity.ok(adminService.getPersonnel(role, search));
     }
 
+    @DeleteMapping("/personnel/{clientId}")
+    public ResponseEntity<Void> deletePersonnel(@PathVariable Long clientId) {
+        adminService.deletePersonnel(clientId);
+        return ResponseEntity.noContent().build();
+    }
+
     // ===== DEPARTMENTS =====
     @GetMapping("/departments")
     public ResponseEntity<List<DepartmentResponse>> getDepartments() {

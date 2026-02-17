@@ -2,9 +2,8 @@ import { useEffect, useState } from 'react';
 import {
   Calendar,
   CheckCircle2,
-  Clock,
   ExternalLink,
-  Search,
+  Search as SearchIcon,
   AlertCircle,
   X
 } from 'lucide-react';
@@ -15,8 +14,10 @@ import type {
   ConsultationSummaryResponse,
   DoctorDashboardResponse,
 } from '../../core/types/api';
+import { ProfileAvatar } from '../../shared/components/ProfileAvatar';
 import { StatCard } from '../../shared/components/StatCard';
 import { StatusPill } from '../../shared/components/StatusPill';
+import { WelcomeBanner } from '../../shared/components/WelcomeBanner';
 
 export function DoctorPage() {
   const { session } = useAuth();
@@ -68,6 +69,18 @@ export function DoctorPage() {
   const ongoingConsultations = consultations.filter(c => c.status !== 'COMPLETED');
   const finishedConsultations = consultations.filter(c => c.status === 'COMPLETED');
 
+  const [consultationStatusFilter, setConsultationStatusFilter] = useState<'all' | 'pending' | 'completed'>('all');
+  const [consultationSearch, setConsultationSearch] = useState('');
+  const statusFiltered =
+    consultationStatusFilter === 'all'
+      ? consultations
+      : consultationStatusFilter === 'completed'
+        ? consultations.filter(c => c.status === 'COMPLETED')
+        : consultations.filter(c => c.status !== 'COMPLETED');
+  const filteredConsultations = consultationSearch.trim()
+    ? statusFiltered.filter(c => c.patientName.toLowerCase().includes(consultationSearch.trim().toLowerCase()))
+    : statusFiltered;
+
   if (loading) {
     return (
       <div className="loading-overlay">
@@ -82,10 +95,6 @@ export function DoctorPage() {
       <header className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div className="page-title">
           <h1>{currentTab === 'dashboard' ? 'Medical Overview' : currentTab.charAt(0).toUpperCase() + currentTab.slice(1)}</h1>
-          <p>
-            {currentTab === 'dashboard' && 'Manage your clinical queue and daily patient operations'}
-            {currentTab === 'consultations' && 'Active medical sessions and patient interactions'}
-          </p>
         </div>
       </header>
 
@@ -101,10 +110,14 @@ export function DoctorPage() {
 
       {currentTab === 'dashboard' && (
         <>
+          <WelcomeBanner
+            role="DOCTOR"
+            name={session?.clientName || 'Doctor'}
+            text="Concentrez-vous sur les soins, nous gérons le reste."
+          />
           <div className="stats-grid">
-            <StatCard label="Upcoming Visits" value={dashboard?.upcomingConsultations ?? 0} icon={Calendar} color="#3b82f6" trend={{ value: 'today', isUp: true }} />
-            <StatCard label="Completed Files" value={dashboard?.completedConsultations ?? 0} icon={CheckCircle2} color="#10b981" />
-            <StatCard label="Clinical Hours" value="6.5h" icon={Clock} color="#6c5ce7" />
+            <StatCard label="Upcoming Visits" value={dashboard?.upcomingConsultations ?? 0} icon={Calendar} color="var(--primary)" />
+            <StatCard label="Completed Files" value={dashboard?.completedConsultations ?? 0} icon={CheckCircle2} color="var(--primary)" />
           </div>
 
           <div className="grid-2">
@@ -118,8 +131,13 @@ export function DoctorPage() {
                     {ongoingConsultations.slice(0, 3).map(c => (
                       <tr key={c.appointmentId}>
                         <td>
-                          <div style={{ fontWeight: 600, color: 'var(--primary)' }}>{c.patientName}</div>
-                          <div className="muted" style={{ fontSize: '0.75rem' }}>{c.hour} - Consultation</div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                            <ProfileAvatar src={c.patientProfilePic} alt={c.patientName} size={36} />
+                            <div>
+                              <div style={{ fontWeight: 600, color: 'var(--primary)' }}>{c.patientName}</div>
+                              <div className="muted" style={{ fontSize: '0.75rem' }}>{c.hour} - Consultation</div>
+                            </div>
+                          </div>
                         </td>
                         <td style={{ textAlign: 'right' }}>
                           <button
@@ -149,8 +167,13 @@ export function DoctorPage() {
                     {finishedConsultations.slice(0, 3).map(c => (
                       <tr key={c.appointmentId}>
                         <td>
-                          <div style={{ fontWeight: 600 }}>{c.patientName}</div>
-                          <div className="muted" style={{ fontSize: '0.75rem' }}>Completed at {c.hour}</div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                            <ProfileAvatar src={c.patientProfilePic} alt={c.patientName} size={36} />
+                            <div>
+                              <div style={{ fontWeight: 600 }}>{c.patientName}</div>
+                              <div className="muted" style={{ fontSize: '0.75rem' }}>Completed at {c.hour}</div>
+                            </div>
+                          </div>
                         </td>
                         <td style={{ textAlign: 'right' }}>
                           <StatusPill value="FINISHED" />
@@ -167,11 +190,30 @@ export function DoctorPage() {
 
       {currentTab === 'consultations' && (
         <article className="table-card">
-          <div className="table-header">
+          <div className="table-header" style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '1rem' }}>
             <h3>Consultation Queue</h3>
-            <div style={{ position: 'relative', width: '280px' }}>
-              <Search size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--ink-muted)' }} />
-              <input type="text" className="input-style" placeholder="Patient name or ID..." style={{ paddingLeft: '2.5rem', height: '36px', fontSize: '0.875rem' }} />
+            <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '0.75rem' }}>
+              <div style={{ position: 'relative' }}>
+                <SearchIcon size={16} style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: 'var(--ink-muted)' }} />
+                <input
+                  type="text"
+                  className="input-style"
+                  placeholder="Search patients..."
+                  value={consultationSearch}
+                  onChange={(e) => setConsultationSearch(e.target.value)}
+                  style={{ paddingLeft: '2.25rem', height: '36px', fontSize: '0.875rem', minWidth: '200px' }}
+                />
+              </div>
+              {(['all', 'pending', 'completed'] as const).map((value) => (
+                <button
+                  key={value}
+                  type="button"
+                  className={`btn btn--small ${consultationStatusFilter === value ? 'btn--secondary' : 'btn--ghost'}`}
+                  onClick={() => setConsultationStatusFilter(value)}
+                >
+                  {value === 'all' ? 'All' : value === 'pending' ? 'Pending' : 'Completed'}
+                </button>
+              ))}
             </div>
           </div>
           <div className="table-wrap">
@@ -185,11 +227,13 @@ export function DoctorPage() {
                 </tr>
               </thead>
               <tbody>
-                {consultations.map(c => (
+                {filteredConsultations.map(c => (
                   <tr key={c.appointmentId}>
                     <td>
-                      <div style={{ fontWeight: 600, color: 'var(--primary)' }}>{c.patientName}</div>
-                      <div className="muted" style={{ fontSize: '0.75rem' }}>ID: #{c.appointmentId}</div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                        <ProfileAvatar src={c.patientProfilePic} alt={c.patientName} size={36} />
+                        <div style={{ fontWeight: 600, color: 'var(--primary)' }}>{c.patientName}</div>
+                      </div>
                     </td>
                     <td><StatusPill value={c.status} /></td>
                     <td>
@@ -201,12 +245,15 @@ export function DoctorPage() {
                         className={`btn ${c.status !== 'COMPLETED' ? 'btn--secondary' : 'btn--ghost'}`}
                         onClick={() => navigateTo(`/app/doctor/consultations/${c.appointmentId}`)}
                       >
-                        {c.status !== 'COMPLETED' ? 'Open Case' : 'View File'}
+                        {c.status !== 'COMPLETED' ? 'Open Case' : 'Consult'}
                         <ExternalLink size={14} style={{ marginLeft: '4px' }} />
                       </button>
                     </td>
                   </tr>
                 ))}
+                {filteredConsultations.length === 0 && (
+                  <tr><td colSpan={4} className="muted" style={{ textAlign: 'center', padding: '2rem' }}>No consultations match the filter</td></tr>
+                )}
               </tbody>
             </table>
           </div>

@@ -84,6 +84,14 @@ export interface CreateAppointmentPayload {
   dateTime: string;
 }
 
+export interface RecordVitalSignsPayload {
+  patientId: number;
+  bloodPressure: string;
+  heartRate: number;
+  temperature: number;
+  weight: number;
+}
+
 export interface DoctorDashboardResponse {
   upcomingConsultations: number;
   completedConsultations: number;
@@ -93,6 +101,7 @@ export interface ConsultationSummaryResponse {
   appointmentId: number;
   patientName: string;
   patientPhone: string;
+  patientProfilePic?: string | null;
   date: string;
   hour: string;
   status: string;
@@ -103,7 +112,7 @@ export interface ConsultationDetailResponse {
   patientName: string;
   patientPhone: string;
   patientLocation: string;
-  patientProfilePic: string;
+  patientProfilePic: string | null;
   date: string;
   hour: string;
   status: string;
@@ -119,4 +128,26 @@ export interface DrugRequest {
 export interface AddPrescriptionPayload {
   patientId: number;
   drugs: DrugRequest[];
+}
+
+export interface DrugResponse {
+  drugName: string;
+  dosage: string;
+  frequency: string;
+  durationDays: string;
+}
+
+export interface PrescriptionResponse {
+  prescriptionId: number;
+  date: string;
+  doctorName: string;
+  doctorDepartment: string;
+  drugs: DrugResponse[];
+}
+
+export interface LabResultResponse {
+  labResultId: number;
+  fileName: string;
+  fileUrl: string;
+  uploadedAt: string;
 }

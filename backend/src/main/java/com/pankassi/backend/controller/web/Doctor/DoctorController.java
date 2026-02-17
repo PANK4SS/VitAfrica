@@ -57,4 +57,16 @@ public class DoctorController {
         doctorService.markAsCompleted(appointmentId);
         return ResponseEntity.ok().build();
     }
+
+    @GetMapping("/consultations/{appointmentId}/prescriptions")
+    public ResponseEntity<List<com.pankassi.backend.dto.response.PrescriptionResponse>> getPrescriptionHistory(
+            @PathVariable Long appointmentId) {
+        return ResponseEntity.ok(doctorService.getPrescriptionHistory(appointmentId));
+    }
+
+    @GetMapping("/consultations/{appointmentId}/lab-results")
+    public ResponseEntity<List<com.pankassi.backend.dto.response.LabResultResponse>> getLabResultHistory(
+            @PathVariable Long appointmentId) {
+        return ResponseEntity.ok(doctorService.getLabResultHistory(appointmentId));
+    }
 }

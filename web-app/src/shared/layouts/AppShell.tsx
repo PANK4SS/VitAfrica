@@ -7,7 +7,6 @@ import {
   LogOut,
   CalendarCheck2,
   Stethoscope,
-  Search,
   Menu
 } from 'lucide-react';
 import { useAuth } from '../../core/auth/AuthContext';
@@ -49,22 +48,24 @@ export function AppShell({ children }: PropsWithChildren) {
 
   const menu = isRoleWithMenu(role) ? navByRole[role] : [];
 
-  const pageTitleByPath: Record<string, string> = {
-    '/app/admin': 'Admin Dashboard',
-    '/app/staff': 'Staff Operations',
-    '/app/doctor': 'Doctor Portal',
-  };
-
-  const getPageTitle = () => {
-    const base = path.split('?')[0];
-    return pageTitleByPath[base] || 'VitAfrica Portal';
-  };
+  // Check if we're on a dashboard (no tab parameter)
+  const isDashboard = path === '/app/admin' || path === '/app/staff' || path === '/app/doctor';
+  const isAdminRequestsPersonnelDepartments =
+    path.startsWith('/app/admin') &&
+    (path.includes('tab=requests') || path.includes('tab=personnel') || path.includes('tab=departments'));
+  const isDoctorConsultationsOrDetail =
+    path.startsWith('/app/doctor') && (path.includes('tab=consultations') || /^\/app\/doctor\/consultations\/\d+$/.test(path.split('?')[0]));
+  const isStaffPatientsOrAppointments =
+    path.startsWith('/app/staff') && (path.includes('tab=patients') || path.includes('tab=appointments'));
+  const showHeader = !isDashboard && !isAdminRequestsPersonnelDepartments && !isDoctorConsultationsOrDetail && !isStaffPatientsOrAppointments;
 
   return (
     <div className="shell">
       <aside className="shell__sidebar">
-        <header className="shell__logo" onClick={() => navigateTo('/')} style={{ justifyContent: 'center' }}>
-          <img src="/logo.png" alt="VitAfrica" style={{ height: '64px', filter: 'brightness(0) invert(1)' }} />
+        <header className="shell__logo" onClick={() => navigateTo('/')} style={{ justifyContent: 'center', padding: '0 2rem' }}>
+          <h2 style={{ fontSize: '1.5rem', fontWeight: 700, color: 'white', letterSpacing: '-0.02em', cursor: 'pointer' }}>
+            Vit<span style={{ color: 'var(--secondary)' }}>Africa</span>
+          </h2>
         </header>
 
         <section className="shell__user">
@@ -108,27 +109,25 @@ export function AppShell({ children }: PropsWithChildren) {
       </aside>
 
       <div className="shell__content">
-        <header className="shell__header">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-            <Menu className="md:hidden" size={20} style={{ color: 'var(--primary)', cursor: 'pointer' }} />
-            <h2 style={{ fontSize: '1.125rem', fontWeight: 700, color: 'var(--primary)' }}>{getPageTitle()}</h2>
-          </div>
-
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
-            <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }} className="hidden md:flex">
-              <Search
-                size={16}
-                style={{ position: 'absolute', left: '0.75rem', color: 'var(--ink-muted)' }}
-              />
-              <input
-                type="text"
-                placeholder="Search patient record..."
-                className="input-style"
-                style={{ width: '240px', paddingLeft: '2.5rem', height: '36px', fontSize: '0.8125rem' }}
-              />
+        {showHeader && (
+          <header className="shell__header">
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', fontSize: '0.875rem', color: 'var(--ink-muted)' }}>
+              <Menu className="md:hidden" size={20} style={{ color: 'var(--primary)', cursor: 'pointer' }} />
+              <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <span>{new Date().toLocaleDateString('fr-FR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span>
+              </span>
             </div>
-          </div>
-        </header>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', paddingLeft: '1rem', borderLeft: '1px solid var(--line)' }}>
+                <div style={{ textAlign: 'right', display: 'none' }} className="hidden sm:block">
+                  <p style={{ fontSize: '0.875rem', fontWeight: 700, color: 'var(--primary)' }}>{session?.clientName || 'User'}</p>
+                  <p style={{ fontSize: '0.75rem', color: 'var(--ink-muted)' }}>{role?.toUpperCase() || 'ROLE'}</p>
+                </div>
+                <ProfileAvatar src={session?.profilePicUrl} alt="User" size={40} />
+              </div>
+            </div>
+          </header>
+        )}
 
         <main className="shell__main">
           {children}

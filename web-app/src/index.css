@@ -55,48 +55,100 @@ body {
   overflow-x: hidden;
 }
 
-/* Auth Pages Layout Overlay */
-.auth-page {
+/* ═══════════════════════════════════════════
+   AUTH DUAL-PANEL LAYOUT (Centered Card)
+   ═══════════════════════════════════════════ */
+
+.auth-page-wrapper {
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 2rem;
-  background: var(--primary);
+  background: rgba(4, 4, 94, 0.06);
   position: relative;
   overflow: hidden;
 }
 
-.auth-page::before {
+.auth-page-wrapper::before {
   content: '';
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  inset: 0;
   background-image: radial-gradient(circle at 20% 30%, var(--secondary-soft) 0%, transparent 50%),
     radial-gradient(circle at 80% 70%, rgba(108, 92, 231, 0.1) 0%, transparent 50%);
   pointer-events: none;
 }
 
-.auth-card {
+.auth-container {
+  position: relative;
   width: 100%;
-  max-width: 440px;
+  max-width: 880px;
+  height: 540px;
   background: var(--surface);
   border-radius: var(--radius-2xl);
-  padding: 3.5rem 2.5rem;
   box-shadow: var(--shadow-xl);
   display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
+  overflow: hidden;
   z-index: 10;
-  animation: slideFadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-@keyframes slideFadeIn {
+/* ───── Image Panel ───── */
+
+.auth-image-panel {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 50%;
+  height: 100%;
+  z-index: 20;
+  transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform;
+  overflow: hidden;
+  border-radius: var(--radius-2xl);
+}
+
+.auth-image-panel--right {
+  transform: translateX(100%);
+}
+
+.auth-image-panel__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* ───── Form Panel ───── */
+
+.auth-form-panel {
+  width: 50%;
+  margin-left: 50%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 2.5rem;
+  transition: margin-left 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow-y: auto;
+}
+
+.auth-form-panel--left {
+  margin-left: 0;
+}
+
+.auth-form-content {
+  width: 100%;
+  max-width: 360px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+  animation: authFadeIn 0.45s ease-out;
+}
+
+@keyframes authFadeIn {
   from {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(12px);
   }
 
   to {
@@ -105,38 +157,175 @@ body {
   }
 }
 
-.auth-card__logo {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.75rem;
-  margin-bottom: 1rem;
+/* ───── Form Header ───── */
+
+.auth-form-header {
+  text-align: center;
+  margin-bottom: 0.15rem;
 }
 
-.auth-card__logo-box {
-  width: 48px;
-  height: 48px;
-  background: var(--secondary);
+.auth-form-header h2 {
+  font-size: 1.5rem;
+  font-weight: 800;
   color: var(--primary);
-  border-radius: 12px;
+}
+
+.auth-form-header .muted {
+  font-size: 0.8125rem;
+  margin-top: 0.15rem;
+}
+
+/* ───── Form Body ───── */
+
+.auth-form {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.auth-input-wrap {
+  position: relative;
+}
+
+.auth-input-icon {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--ink-muted);
+  pointer-events: none;
+}
+
+.auth-eye-btn {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--ink-muted);
+  display: flex;
+  align-items: center;
+  padding: 4px;
+}
+
+.auth-eye-btn:hover {
+  color: var(--primary);
+}
+
+.auth-submit-btn {
+  width: 100%;
+  height: 42px;
+  font-size: 0.875rem;
+  margin-top: 0.15rem;
+}
+
+/* ───── Form Footer ───── */
+
+.auth-form-footer {
+  text-align: center;
+  font-size: 0.8125rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 900;
-  font-size: 1.5rem;
+  gap: 0.5rem;
 }
 
-.auth-card h2 {
-  font-size: 1.75rem;
-  font-weight: 800;
+.auth-link-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: none;
+  cursor: pointer;
   color: var(--primary);
-  text-align: center;
+  font-weight: 700;
+  font-size: 0.8125rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--radius-sm);
+  transition: background 0.2s;
 }
 
-.auth-card p.muted {
-  text-align: center;
-  margin-top: -0.5rem;
-  font-size: 0.9375rem;
+.auth-link-btn:hover {
+  background: var(--line-soft);
+  text-decoration: underline;
+}
+
+/* ───── Register Extras ───── */
+
+.auth-stepper {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.auth-stepper__bar {
+  flex: 1;
+  height: 3px;
+  background: var(--line);
+  border-radius: 2px;
+  transition: background 0.3s ease;
+}
+
+.auth-stepper__bar--active {
+  background: var(--secondary);
+}
+
+.auth-avatar-ring {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  border: 3px solid var(--secondary);
+  overflow: hidden;
+  background: var(--surface-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.auth-avatar-btn {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  background: var(--primary);
+  color: white;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: var(--shadow-md);
+  transition: transform 0.2s;
+}
+
+.auth-avatar-btn:hover {
+  transform: scale(1.1);
+}
+
+/* ───── Responsive: stack on mobile ───── */
+
+@media (max-width: 900px) {
+  .auth-container {
+    flex-direction: column;
+    height: auto;
+    max-width: 440px;
+  }
+
+  .auth-image-panel {
+    position: relative;
+    width: 100%;
+    height: 200px;
+    border-radius: var(--radius-2xl) var(--radius-2xl) 0 0;
+    transform: none !important;
+  }
+
+  .auth-form-panel {
+    width: 100%;
+    margin-left: 0 !important;
+    padding: 1.5rem;
+    height: auto;
+  }
 }
 
 /* Modern Inputs */
@@ -156,9 +345,9 @@ body {
 
 .input-style {
   width: 100%;
-  padding: 0.875rem 1rem;
-  border: 1.5px solid var(--line);
-  border-radius: var(--radius-lg);
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-xl);
   background: var(--surface-muted);
   transition: all 0.2s ease;
   outline: none;
@@ -178,36 +367,39 @@ body {
   align-items: center;
   justify-content: center;
   gap: 0.625rem;
-  padding: 1rem 1.5rem;
-  border-radius: var(--radius-lg);
+  padding: 0.875rem 1.5rem;
+  border-radius: var(--radius-xl);
   font-weight: 700;
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   border: none;
-  font-size: 1rem;
+  font-size: 0.9375rem;
 }
 
 .btn--primary {
   background: var(--primary);
   color: white;
+  box-shadow: 0 4px 14px 0 rgba(4, 4, 94, 0.2);
 }
 
 .btn--primary:hover {
   background: var(--primary-light);
   transform: translateY(-1px);
-  box-shadow: var(--shadow-lg);
+  box-shadow: 0 6px 20px 0 rgba(4, 4, 94, 0.3);
 }
 
 .btn--secondary {
   background: var(--secondary);
   color: var(--primary);
   box-shadow: 0 4px 14px 0 rgba(185, 250, 60, 0.3);
+  font-weight: 700;
 }
 
 .btn--secondary:hover {
   background: var(--secondary-hover);
   transform: translateY(-1px);
   box-shadow: 0 6px 20px 0 rgba(185, 250, 60, 0.45);
+  filter: brightness(1.05);
 }
 
 .btn--ghost {
@@ -219,6 +411,11 @@ body {
   background: var(--line-soft);
 }
 
+.btn--small {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+}
+
 /* App Shell Structure */
 .shell {
   display: flex;
@@ -227,7 +424,7 @@ body {
 }
 
 .shell__sidebar {
-  width: 280px;
+  width: 256px;
   background: var(--primary);
   color: white;
   display: flex;
@@ -235,6 +432,7 @@ body {
   z-index: 50;
   box-shadow: 4px 0 24px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
+  flex-shrink: 0;
 }
 
 .shell__logo {
@@ -373,7 +571,7 @@ body {
 }
 
 .shell__header {
-  height: 64px;
+  height: 80px;
   background: white;
   border-bottom: 1px solid var(--line);
   display: flex;
@@ -381,6 +579,7 @@ body {
   justify-content: space-between;
   padding: 0 2rem;
   z-index: 40;
+  flex-shrink: 0;
 }
 
 .shell__main {
@@ -388,19 +587,43 @@ body {
   padding: 2rem;
   overflow-y: auto;
   scroll-behavior: smooth;
+  background: var(--surface-muted);
+}
+
+/* Custom Scrollbar */
+.shell__main::-webkit-scrollbar {
+  width: 6px;
+}
+
+.shell__main::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.shell__main::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+.shell__main::-webkit-scrollbar-thumb:hover {
+  background: var(--primary);
 }
 
 /* Page Components */
 .page-title h1 {
-  font-size: 1.5rem;
+  font-size: 1.75rem;
   font-weight: 800;
   color: var(--primary);
+  letter-spacing: -0.02em;
 }
 
 .page-title p {
   color: var(--ink-soft);
   font-size: 0.875rem;
   margin-top: 0.125rem;
+}
+
+.page-header {
+  margin-bottom: 0;
 }
 
 .stats-grid {
@@ -413,8 +636,8 @@ body {
 .stat-card {
   background: white;
   padding: 1.5rem;
-  border-radius: var(--radius-xl);
-  border: 1px solid var(--line);
+  border-radius: var(--radius-2xl);
+  border: 1px solid var(--line-soft);
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
@@ -455,8 +678,8 @@ body {
 /* Data Components */
 .table-card {
   background: white;
-  border-radius: var(--radius-xl);
-  border: 1px solid var(--line);
+  border-radius: var(--radius-2xl);
+  border: 1px solid var(--line-soft);
   box-shadow: var(--shadow-sm);
   overflow: hidden;
 }
@@ -611,6 +834,20 @@ tr:hover td {
     display: none;
     /* Mobile menu logic should be added if needed */
   }
+
+  .hidden.md\:block {
+    display: none !important;
+  }
+}
+
+@media (min-width: 768px) {
+  .hidden.md\:block {
+    display: block !important;
+  }
+
+  .welcome-illustration {
+    display: block !important;
+  }
 }
 
 /* Utils */
@@ -632,4 +869,25 @@ tr:hover td {
 
 .italic {
   font-style: italic;
+}
+
+/* Fade-in animation */
+.fade-in {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.page-grid {
+  animation: fadeIn 0.3s ease-in-out;
 }

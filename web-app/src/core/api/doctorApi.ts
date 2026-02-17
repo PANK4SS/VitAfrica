@@ -3,6 +3,8 @@ import type {
   ConsultationDetailResponse,
   ConsultationSummaryResponse,
   DoctorDashboardResponse,
+  LabResultResponse,
+  PrescriptionResponse,
 } from '../types/api';
 import { httpRequest } from './httpClient';
 
@@ -50,5 +52,13 @@ export const doctorApi = {
       method: 'PATCH',
       token,
     });
+  },
+
+  getPrescriptionHistory(token: string, appointmentId: number): Promise<PrescriptionResponse[]> {
+    return httpRequest(`/api/doctor/consultations/${appointmentId}/prescriptions`, { token });
+  },
+
+  getLabResultHistory(token: string, appointmentId: number): Promise<LabResultResponse[]> {
+    return httpRequest(`/api/doctor/consultations/${appointmentId}/lab-results`, { token });
   },
 };

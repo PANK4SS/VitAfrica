@@ -200,6 +200,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     final value = imagePath.trim();
 
+    // Normalize legacy / inconsistent persisted shapes for backend-hosted profile pictures.
+    const profileMarker = 'profile-pictures/';
+    if (value.contains(profileMarker) && !value.contains('/api/files/profile-pictures/')) {
+      final idx = value.lastIndexOf(profileMarker);
+      final filename = value.substring(idx + profileMarker.length);
+      if (filename.isNotEmpty) {
+        return NetworkImage(
+          '${ApiConstants.baseHost}/api/files/profile-pictures/${filename.replaceFirst(RegExp(r'^/+'), '')}',
+        );
+      }
+    }
+
     // Fix legacy URLs that still point to an old local IP by mapping them to the current public backend host.
     const legacyHost = 'http://192.168.100.202:8080';
     if (value.startsWith(legacyHost)) {
@@ -208,8 +220,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
       return NetworkImage('${ApiConstants.baseHost}$normalizedPath');
     }
 
-    // Absolute URL.
+    // Absolute backend URL: force host to current baseHost if it's a backend file URL.
     if (value.startsWith('http://') || value.startsWith('https://')) {
+      final filePathIdx = value.indexOf('/api/files/profile-pictures/');
+      if (filePathIdx != -1) {
+        return NetworkImage('${ApiConstants.baseHost}${value.substring(filePathIdx)}');
+      }
       return NetworkImage(value);
     }
 

@@ -3,6 +3,7 @@ import type {
   DoctorSummaryResponse,
   PatientSummaryResponse,
   StaffDashboardResponse,
+  RecordVitalSignsPayload,
 } from '../types/api';
 import { httpRequest } from './httpClient';
 
@@ -22,6 +23,14 @@ export const staffApi = {
 
   createAppointment(token: string, payload: CreateAppointmentPayload): Promise<void> {
     return httpRequest('/api/staff/appointments', {
+      method: 'POST',
+      token,
+      body: payload,
+    });
+  },
+
+  recordVitalSigns(token: string, payload: RecordVitalSignsPayload): Promise<void> {
+    return httpRequest('/api/staff/vital-signs', {
       method: 'POST',
       token,
       body: payload,

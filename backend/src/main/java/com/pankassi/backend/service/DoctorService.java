@@ -6,6 +6,9 @@ import com.pankassi.backend.domain.model.*;
 import com.pankassi.backend.domain.repository.*;
 import com.pankassi.backend.dto.request.AddPrescriptionRequest;
 import com.pankassi.backend.dto.response.Doctor.*;
+import com.pankassi.backend.dto.response.DrugResponse;
+import com.pankassi.backend.dto.response.LabResultResponse;
+import com.pankassi.backend.dto.response.PrescriptionResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -34,6 +37,8 @@ public class DoctorService {
 
     private static final DateTimeFormatter DATE_FMT = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     private static final DateTimeFormatter HOUR_FMT = DateTimeFormatter.ofPattern("HH:mm");
+    private static final DateTimeFormatter DATE_DISPLAY = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+    private static final DateTimeFormatter DATETIME_DISPLAY = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
     // ✅ Utilitaire
     private Doctor getAuthenticatedDoctor() {
@@ -66,6 +71,7 @@ public class DoctorService {
                         a.getAppointmentId(),
                         a.getPatient().getClient().getClientName(),
                         a.getPatient().getPhone(),
+                        a.getPatient().getProfilePicUrl() != null ? a.getPatient().getProfilePicUrl() : "",
                         a.getDateTime().format(DATE_FMT),
                         a.getDateTime().format(HOUR_FMT),
                         a.getStatus()
@@ -184,5 +190,53 @@ public class DoctorService {
 
         appointment.setStatus("COMPLETED");
         appointmentRepository.save(appointment);
+    }
+
+    @Transactional(readOnly = true)
+    public List<PrescriptionResponse> getPrescriptionHistory(Long appointmentId) {
+        Doctor doctor = getAuthenticatedDoctor();
+        Appointment appointment = appointmentRepository.findById(appointmentId)
+                .orElseThrow(() -> new IllegalArgumentException("Appointment not found"));
+        if (!appointment.getDoctor().getDoctorId().equals(doctor.getDoctorId())) {
+            throw new IllegalStateException("Access denied");
+        }
+        Patient patient = appointment.getPatient();
+        return prescriptionRepository.findByPatientOrderByPrescriptionDateDesc(patient)
+                .stream()
+                .map(p -> new PrescriptionResponse(
+                        p.getPrescriptionId(),
+                        p.getPrescriptionDate().format(DATE_DISPLAY),
+                        p.getDoctor().getClient().getClientName(),
+                        p.getDoctor().getDepartment(),
+                        p.getDrugs().stream()
+                                .map(d -> new DrugResponse(
+                                        d.getDrugName(),
+                                        d.getDosage(),
+                                        d.getFrequency(),
+                                        d.getDurationDays() + " jours"
+                                ))
+                                .toList()
+                ))
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<LabResultResponse> getLabResultHistory(Long appointmentId) {
+        Doctor doctor = getAuthenticatedDoctor();
+        Appointment appointment = appointmentRepository.findById(appointmentId)
+                .orElseThrow(() -> new IllegalArgumentException("Appointment not found"));
+        if (!appointment.getDoctor().getDoctorId().equals(doctor.getDoctorId())) {
+            throw new IllegalStateException("Access denied");
+        }
+        Patient patient = appointment.getPatient();
+        return labResultRepository.findByPatientOrderByUploadedAtDesc(patient)
+                .stream()
+                .map(lab -> new LabResultResponse(
+                        lab.getLabResultId(),
+                        lab.getFileName(),
+                        lab.getFileUrl(),
+                        lab.getUploadedAt().format(DATETIME_DISPLAY)
+                ))
+                .toList();
     }
 }

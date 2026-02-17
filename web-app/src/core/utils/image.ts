@@ -53,6 +53,39 @@ export async function compressImage(file: File): Promise<Blob> {
 const DEFAULT_API_BASE_URL = 'https://vitafrica-production.up.railway.app';
 const LEGACY_DEV_HOST = 'http://192.168.100.202:8080';
 
+function getApiBase(): string {
+    return (import.meta.env.VITE_API_BASE_URL ?? DEFAULT_API_BASE_URL).replace(/\/+$/, '');
+}
+
+function normalizeBackendFileUrl(input: string): string | undefined {
+    const value = input.trim();
+    if (!value) return undefined;
+
+    // Common legacy persisted shapes we can safely normalize.
+    // - ".../api/files/profile-pictures/<file>"
+    // - ".../profile-pictures/<file>" (missing /api/files prefix)
+    // - ".../uploads/profile-pictures/<file>"
+    // - "profile-pictures/<file>" or "uploads/profile-pictures/<file>"
+    const profileMarker = 'profile-pictures/';
+    if (value.includes(profileMarker) && !value.includes('/api/files/profile-pictures/')) {
+        const idx = value.lastIndexOf(profileMarker);
+        const filename = value.substring(idx + profileMarker.length);
+        if (filename) {
+            const base = getApiBase();
+            return `${base}/api/files/profile-pictures/${filename.replace(/^\/+/, '')}`;
+        }
+    }
+
+    // If the URL already contains the correct public path, force the host to the configured API base.
+    if (value.includes('/api/files/profile-pictures/')) {
+        const base = getApiBase();
+        const pathIdx = value.indexOf('/api/files/profile-pictures/');
+        return `${base}${value.substring(pathIdx)}`;
+    }
+
+    return undefined;
+}
+
 export function resolveImageUrl(url?: string | null): string | undefined {
     if (!url) return undefined;
 
@@ -62,9 +95,13 @@ export function resolveImageUrl(url?: string | null): string | undefined {
     // Ignore known backend placeholder value.
     if (trimmed.includes('default-admin.png')) return undefined;
 
+    // Normalize legacy / inconsistent persisted URLs for backend-hosted profile pictures.
+    const normalizedBackend = normalizeBackendFileUrl(trimmed);
+    if (normalizedBackend) return normalizedBackend;
+
     // Migrate legacy dev URLs (old local IP) to the current API base URL
     if (trimmed.startsWith(LEGACY_DEV_HOST)) {
-        const base = (import.meta.env.VITE_API_BASE_URL ?? DEFAULT_API_BASE_URL).replace(/\/+$/, '');
+        const base = getApiBase();
         const path = trimmed.substring(LEGACY_DEV_HOST.length);
         if (!path) {
             return base;
@@ -84,7 +121,7 @@ export function resolveImageUrl(url?: string | null): string | undefined {
         return trimmed;
     }
 
-    const base = (import.meta.env.VITE_API_BASE_URL ?? DEFAULT_API_BASE_URL).replace(/\/+$/, '');
+    const base = getApiBase();
     if (trimmed.startsWith('/')) {
         return `${base}${trimmed}`;
     }

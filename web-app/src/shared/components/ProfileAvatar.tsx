@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { User } from 'lucide-react';
 import { resolveImageUrl } from '../../core/utils/image';
 
@@ -13,6 +13,10 @@ export function ProfileAvatar({ src, alt, size = 40, className = '' }: ProfileAv
   const [loadFailed, setLoadFailed] = useState(false);
   const resolvedSrc = useMemo(() => resolveImageUrl(src), [src]);
   const showImage = Boolean(resolvedSrc) && !loadFailed;
+
+  useEffect(() => {
+    setLoadFailed(false);
+  }, [src]);
 
   const baseStyle = {
     width: `${size}px`,

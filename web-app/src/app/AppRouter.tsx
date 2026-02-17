@@ -1,7 +1,6 @@
 import { useMemo } from 'react';
 import { useAuth } from '../core/auth/AuthContext';
-import { LoginPage } from '../features/auth/LoginPage';
-import { RegisterPage } from '../features/auth/RegisterPage';
+import { AuthPage } from '../features/auth/AuthPage';
 import { AdminPage } from '../features/admin/AdminPage';
 import { ConsultationDetailPage } from '../features/doctor/ConsultationDetailPage';
 import { DoctorPage } from '../features/doctor/DoctorPage';
@@ -24,8 +23,8 @@ export function AppRouter() {
 
   const page = useMemo(() => {
     if (path === '/') return <LandingPage />;
-    if (path === '/login') return <LoginPage />;
-    if (path === '/register') return <RegisterPage />;
+    if (path === '/login') return <AuthPage initialMode="login" />;
+    if (path === '/register') return <AuthPage initialMode="register" />;
 
     if (path.startsWith('/app')) {
       if (!isAuthenticated) {

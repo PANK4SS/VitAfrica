@@ -27,11 +27,10 @@ public class VitAfricaSecurityConfig {
     @Order(2)  // ✅ S'exécute APRÈS AccessCoreSecurityConfig (order=1)
     public SecurityFilterChain vitAfricaFilterChain(HttpSecurity http) throws Exception {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of(
-                "http://localhost:5173",
-                "http://localhost:5174",
-                "http://localhost:5175",
-                "http://localhost:3000",
+        configuration.setAllowedOriginPatterns(List.of(
+                "http://localhost:*",
+                "https://*.vercel.app",
+                "http://*.vercel.app",
                 "https://vitafrica-production.up.railway.app"
         ));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));

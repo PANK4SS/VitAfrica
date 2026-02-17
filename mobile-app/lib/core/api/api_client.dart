@@ -10,6 +10,9 @@ class ApiClient {
       Uri.parse(url),
       headers: {
         'Content-Type': 'application/json',
+        // Avoid any intermediate caching so UI reflects backend changes without logout.
+        'Cache-Control': 'no-cache',
+        'Pragma': 'no-cache',
         if (token != null) 'Authorization': 'Bearer $token',
       },
     );
@@ -26,6 +29,8 @@ class ApiClient {
       Uri.parse(url),
       headers: {
         'Content-Type': 'application/json',
+        'Cache-Control': 'no-cache',
+        'Pragma': 'no-cache',
         if (token != null) 'Authorization': 'Bearer $token',
       },
       body: jsonEncode(body),
